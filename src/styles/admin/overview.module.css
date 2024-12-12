@@ -214,3 +214,68 @@
   .dateSection {
       margin: 20px 0 60px 0;
   }
+
+  .pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+    margin-top: 2rem;
+    padding: 1rem 0;
+  }
+
+  .paginationButton {
+    padding: 0.5rem 1rem;
+    border: 1px solid #dee2e6;
+    background-color: white;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .paginationButton:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  .paginationButton:hover:not(:disabled) {
+    background-color: #f8f9fa;
+  }
+
+  .pageInfo {
+    color: #6c757d;
+    font-size: 0.9rem;
+  }
+
+  .activeFilters {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+  }
+
+  .filterButton {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 4px 12px;
+    background-color: #e9ecef;
+    border-radius: 16px;
+    font-size: 14px;
+  }
+
+  .removeFilter {
+    background: none;
+    border: none;
+    color: #495057;
+    cursor: pointer;
+    font-size: 18px;
+    padding: 0 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .removeFilter:hover {
+    color: #dc3545;
+  }

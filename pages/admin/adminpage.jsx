@@ -5,6 +5,7 @@ import SideNavBar from '../../src/components/admin/SideNavBar';
 import Card from '../../src/components/admin/Card';
 import { useRouter } from 'next/router';
 import ProtectedRoute from '@/components/ProtectedRoute';
+import Pagination from '../../src/components/admin/Pagination';
 
 const SCREEN2ADP = () => {
   const router = useRouter(); 
@@ -16,41 +17,50 @@ const SCREEN2ADP = () => {
       role: ""
     };
   });
+  const tooltipTexts = {
+    employeesPresent: "Total number of employees present",
+    halfLeave: "Total employees on half leave. (Off-shore employees can have first half off and On-shore employees the second respectively)",
+    fullLeave: "Total employees on full leave",
+    rhLeave: "Total employees on RH leave",
+    compOffLeave: "Total employees on comp-off leave"
+  };
 
   const [leaveData, setLeaveData] = useState({
-    employeesPresent: 45,
-    fullLeave: 1,
-    halfLeave: 2,
+    employeesPresent: 0,
+    fullLeave: 0,
+    halfLeave: 0,
     rhLeave: 0,
     compOffLeave: 0
   });
 
- // Comment out or remove the useEffect for now since we're not using the API yet
-  /* 
+  const [onLeaveToday, setOnLeaveToday] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const itemsPerPage = 10;
+
   useEffect(() => {
-    const fetchUserData = async () => {
+    const fetchDashboardData = async () => {
       try {
-        const response = await fetch('/api/user');
+        setIsLoading(true);
+        const response = await fetch(`/api/adminpage?page=${currentPage}&limit=${itemsPerPage}`);
         const data = await response.json();
-        setUser({
-          name: data.name,
-          email: data.email,
-          profilePicture: data.profilePicture
-        });
+        if (response.ok) {
+          setLeaveData(data.leaveData);
+          setOnLeaveToday(data.onLeaveToday);
+          setTotalPages(data.pagination.totalPages);
+        } else {
+          console.error('Failed to fetch dashboard data:', data.message);
+        }
       } catch (error) {
-        console.error('Error fetching user data:', error);
-        // Use default values for testing if API call fails
-        setUser({
-          name: "Admin",
-          email: "admin@domain.com",
-          profilePicture: "/admin-profile.png"
-        });
+        console.error('Error fetching dashboard data:', error);
+      } finally {
+        setIsLoading(false);
       }
     };
 
-    fetchUserData();
-  }, []);
-   */
+    fetchDashboardData();
+  }, [currentPage]);
 
   const onDashboardIconClick = useCallback(() => {
     router.push('/admin/adminpage');
@@ -65,6 +75,10 @@ const SCREEN2ADP = () => {
     router.push('/admin/attendanceOverview');
   }, [router]);
 
+  const handlePageChange = (newPage) => {
+    setCurrentPage(newPage);
+  };
+  
   return (
     <div className={styles.screen2Adp}>
       <TopNavBar user={user} />
@@ -75,36 +89,41 @@ const SCREEN2ADP = () => {
       />
       <main className={styles.mainContent}>
         <section className={styles.cardsSection}>
-          <Card
-            title="Employees Present"
-            count={leaveData.employeesPresent}
-            iconSrc="/employees-icon.svg"
-            altText="Employees Icon"
-          />
-          <Card
-            title="Half Leave"
-            count={leaveData.halfLeave}
-            iconSrc="/half-leave-icon.svg"
-            altText="Half Leave Icon"
-          />
-          <Card
-            title="Full Leave"
-            count={leaveData.fullLeave}
-            iconSrc="/full-leave-icon.svg"
-            altText="Full Leave Icon"
-          />
-          <Card
-            title="RH"
-            count={leaveData.rhLeave}
-            iconSrc="/rh-icon.svg"
-            altText="RH Icon"
-          />
-          <Card
-            title="Comp Off"
-            count={leaveData.compOffLeave}
-            iconSrc="/comp-off-icon.svg"
-            altText="Comp Off Icon"
-          />
+        <Card 
+        title="Employees Present" 
+        count={leaveData.employeesPresent} 
+        iconSrc="/employees-icon.svg" 
+        altText="Employees Present Icon"
+        tooltipText={tooltipTexts.employeesPresent}
+      />
+      <Card 
+        title="Half Leave" 
+        count={leaveData.halfLeave} 
+        iconSrc="/half-leave-icon.svg" 
+        altText="Half Leave Icon"
+        tooltipText={tooltipTexts.halfLeave}
+      />
+      <Card 
+        title="Full Leave" 
+        count={leaveData.fullLeave} 
+        iconSrc="/full-leave-icon.svg" 
+        altText="Full Leave Icon"
+        tooltipText={tooltipTexts.fullLeave}
+      />
+      <Card 
+        title="RH Leave" 
+        count={leaveData.rhLeave} 
+        iconSrc="/rh-icon.svg" 
+        altText="RH Leave Icon"
+        tooltipText={tooltipTexts.rhLeave}
+      />
+      <Card 
+        title="Comp Off Leave" 
+        count={leaveData.compOffLeave} 
+        iconSrc="/comp-off-icon.svg" 
+        altText="Comp Off Leave Icon"
+        tooltipText={tooltipTexts.compOffLeave}
+      />
         </section>
 
         <button className={styles.viewAttendanceButton} onClick={handleViewAttendanceClick}>
@@ -122,19 +141,20 @@ const SCREEN2ADP = () => {
               </tr>
             </thead>
             <tbody>
-              {/* Example data, replace with dynamic data */}
-              <tr>
-                <td>12345678</td>
-                <td>John Doe</td>
-                <td>Full Leave</td>
-              </tr>
-              <tr>
-                <td>67890567</td>
-                <td>Jane Smith</td>
-                <td>Half Leave</td>
-              </tr>
+              {onLeaveToday.map((leave, index) => (
+                <tr key={index}>
+                  <td>{leave.sapId}</td>
+                  <td>{leave.employeeName}</td>
+                  <td>{leave.leaveType}</td>
+                </tr>
+              ))}
             </tbody>
           </table>
+          <Pagination 
+            currentPage={currentPage} 
+            totalPages={totalPages} 
+            onPageChange={handlePageChange} 
+          />
         </section>
       </main>
     </div>

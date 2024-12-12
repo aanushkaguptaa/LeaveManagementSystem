@@ -4,12 +4,18 @@ import TopNavBar from '../../src/components/TopNavBar';
 import SideNavBar from '../../src/components/admin/SideNavBar'; 
 import { useRouter } from 'next/router';
 import ProtectedRoute from '@/components/ProtectedRoute';
+import { exportToExcel } from '@/utils/excelExport';
+import Pagination from '../../src/components/admin/Pagination';
+import FilterButton from '../../src/components/admin/FilterButton';
 
 const SCREEN1ADP = () => {
-  const [user, setUser] = useState({
-    name: "Admin",
-    email: "admin@domain.com",
-    profilePicture: "/profile.png"
+  const [user, setUser] = useState(() => {
+    const storedUser = localStorage.getItem('user');
+    return storedUser ? JSON.parse(storedUser) : {
+      name: "",
+      sapId: "",
+      role: ""
+    };
   });
 
   const router = useRouter(); 
@@ -21,24 +27,7 @@ const SCREEN1ADP = () => {
     router.push('/admin/attendanceOverview');
   }, [router]);
 
-  const attendanceData = [
-    {
-      sapId: "2341421",
-      employeeName: "Ali Alhamdan",
-      leaveType: "Full Leave",
-      leaveRequestDateFrom: "29 July 2023",
-      leaveRequestDateTo: "29 July 2023",
-      leaveRequestedOn: "02 July 2023"
-    },
-    {
-      sapId: "3411421",
-      employeeName: "Ahmed Rashdan",
-      leaveType: "Half Leave",
-      leaveRequestDateFrom: "29 July 2023",
-      leaveRequestDateTo: "29 July 2023",
-      leaveRequestedOn: "04 July 2023"
-    },
-  ];
+  const [attendanceData, setAttendanceData] = useState([]);
 
   const [activePopup, setActivePopup] = useState(null);
   const [searchFilters, setSearchFilters] = useState({
@@ -48,6 +37,32 @@ const SCREEN1ADP = () => {
     endDate: '',
     leaveType: ''
   });
+
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const itemsPerPage = 10;
+
+  useEffect(() => {
+    const fetchAttendanceData = async () => {
+      try {
+        const queryParams = new URLSearchParams({
+          ...searchFilters,
+          page: currentPage,
+          limit: itemsPerPage
+        }).toString();
+        
+        const response = await fetch(`/api/attendanceOverview?${queryParams}`);
+        const data = await response.json();
+        
+        setAttendanceData(data.requests);
+        setTotalPages(data.pagination.totalPages);
+      } catch (error) {
+        console.error('Error fetching attendance data:', error);
+      }
+    };
+
+    fetchAttendanceData();
+  }, [searchFilters, currentPage]);
 
   const handleSearchClick = (popupType) => {
     setActivePopup(popupType);
@@ -65,151 +80,189 @@ const SCREEN1ADP = () => {
     setActivePopup(null);
   };
 
+  const handlePageChange = (newPage) => {
+    setCurrentPage(newPage);
+  };
+
+  const handleExportClick = () => {
+    const exportData = attendanceData.map(item => ({
+      'SAP ID': item.sapId,
+      'Employee Name': item.employeeName,
+      'Leave Type': item.leaveType,
+      'From Date': item.leaveRequestDateFrom,
+      'To Date': item.leaveRequestDateTo,
+      'Requested On': item.leaveRequestedOn
+    }));
+    
+    exportToExcel(exportData, 'attendance_overview');
+  };
+
   return (
     <div className={styles.screen1Adp}>
-    <TopNavBar user={user} />
-    <SideNavBar 
-        onDashboardIconClick={onDashboardIconClick} 
-        onAttendanceOverviewIconClick={onAttendanceOverviewIconClick} 
-        activePage="attendanceOverview" 
-    />
-    <main className={styles.mainContent}>
-    <div className={styles.tableContainer}>
-    <h1 className={styles.title}>Attendance Overview</h1>
-    <div className={styles.headerSection}>
-    <button className={styles.exportButton}>Export to Excel</button>
-    
-    <div className={styles.searchSection}>
-      <span className={styles.searchLabel}>Search By:</span>
+      <TopNavBar user={user} />
+      <SideNavBar 
+          onDashboardIconClick={onDashboardIconClick} 
+          onAttendanceOverviewIconClick={onAttendanceOverviewIconClick} 
+          activePage="attendanceOverview" 
+      />
+      <main className={styles.mainContent}>
+        <div className={styles.tableContainer}>
+          <h1 className={styles.title}>Attendance Overview</h1>
+          <div className={styles.headerSection}>
+            <button className={styles.exportButton} onClick={handleExportClick}>Export to Excel</button>
+            
+            <div className={styles.searchSection}>
+              <span className={styles.searchLabel}>Search By:</span>
+              <div className={styles.searchButtons}>
+                <button className={styles.searchButton} onClick={() => handleSearchClick('sapId')}>SAP-ID</button>
+                <button className={styles.searchButton} onClick={() => handleSearchClick('employeeName')}>Employee-Name</button>
+                <button className={styles.searchButton} onClick={() => handleSearchClick('calendar')}>Calendar</button>
+                <button className={styles.searchButton} onClick={() => handleSearchClick('leaveType')}>Leave Type</button>
+              </div>
+            </div>
+          </div>
 
-      <div className={styles.searchButtons}>
-        <button className={styles.searchButton} onClick={() => handleSearchClick('sapId')}>SAP-ID</button>
-        <button className={styles.searchButton} onClick={() => handleSearchClick('employeeName')}>Employee-Name</button>
-        <button className={styles.searchButton} onClick={() => handleSearchClick('calendar')}>Calendar</button>
-        <button className={styles.searchButton} onClick={() => handleSearchClick('leaveType')}>Leave Type</button>
-      </div>
+          <div className={styles.activeFilters}>
+            {searchFilters.sapId && (
+              <FilterButton 
+                label="SAP ID" 
+                value={searchFilters.sapId} 
+                onRemove={() => setSearchFilters(prev => ({ ...prev, sapId: '' }))} 
+              />
+            )}
+            {searchFilters.employeeName && (
+              <FilterButton 
+                label="Employee Name" 
+                value={searchFilters.employeeName} 
+                onRemove={() => setSearchFilters(prev => ({ ...prev, employeeName: '' }))} 
+              />
+            )}
+            {/* Add more filters as needed */}
+          </div>
 
-      </div>
-     </div>
-
-        <table className={styles.overviewTable}>
-            <thead>
-              <tr>
-                <th>SAP ID</th>
-                <th>Employee Name</th>
-                <th>Leave Type</th>
-                <th>Leave Request Date From</th>
-                <th>Leave Request Date To</th>
-                <th>Leave Requested On</th>
-              </tr>
-            </thead>
-            <tbody>
-              {attendanceData.map((item, index) => (
-                <tr key={index}>
-                  <td>{item.sapId}</td>
-                  <td>{item.employeeName}</td>
-                  <td>{item.leaveType}</td>
-                  <td>{item.leaveRequestDateFrom}</td>
-                  <td>{item.leaveRequestDateTo}</td>
-                  <td>{item.leaveRequestedOn}</td>
+          <table className={styles.overviewTable}>
+              <thead>
+                <tr>
+                  <th>SAP ID</th>
+                  <th>Employee Name</th>
+                  <th>Leave Type</th>
+                  <th>Leave Request Date From</th>
+                  <th>Leave Request Date To</th>
+                  <th>Leave Requested On</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {attendanceData.map((item, index) => (
+                  <tr key={index}>
+                    <td>{item.sapId}</td>
+                    <td>{item.employeeName}</td>
+                    <td>{item.leaveType}</td>
+                    <td>{item.leaveRequestDateFrom}</td>
+                    <td>{item.leaveRequestDateTo}</td>
+                    <td>{item.leaveRequestedOn}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          <Pagination 
+            currentPage={currentPage} 
+            totalPages={totalPages} 
+            onPageChange={handlePageChange} 
+          />
         </div>
 
-  {activePopup && (
-    <div className={styles.overlay}>
-      <div className={styles.popup}>
-        <button className={styles.closeButton} onClick={handleClosePopup}>×</button>
-        
-        {activePopup === 'sapId' && (
-          <>
-            <h2>Enter SAP ID</h2>
-            <input 
-              type="text" 
-              value={searchFilters.sapId}
-              onChange={(e) => setSearchFilters(prev => ({ ...prev, sapId: e.target.value }))}
-            />
-            <button 
-              className={styles.doneButton}
-              onClick={() => handleApplySearch('sapId', { sapId: searchFilters.sapId })}
-            >
-              Done
-            </button>
-          </>
-        )}
+        {activePopup && (
+          <div className={styles.overlay}>
+            <div className={styles.popup}>
+              <button className={styles.closeButton} onClick={handleClosePopup}>×</button>
+              
+              {activePopup === 'sapId' && (
+                <>
+                  <h2>Enter SAP ID</h2>
+                  <input 
+                    type="text" 
+                    value={searchFilters.sapId}
+                    onChange={(e) => setSearchFilters(prev => ({ ...prev, sapId: e.target.value }))}
+                  />
+                  <button 
+                    className={styles.doneButton}
+                    onClick={() => handleApplySearch('sapId', { sapId: searchFilters.sapId })}
+                  >
+                    Done
+                  </button>
+                </>
+              )}
 
-        {activePopup === 'employeeName' && (
-          <>
-            <h2>Enter Employee Name</h2>
-            <input 
-              type="text"
-              value={searchFilters.employeeName}
-              onChange={(e) => setSearchFilters(prev => ({ ...prev, employeeName: e.target.value }))}
-            />
-            <button 
-              className={styles.doneButton}
-              onClick={() => handleApplySearch('employeeName', { employeeName: searchFilters.employeeName })}
-            >
-              Done
-            </button>
-          </>
-        )}
+              {activePopup === 'employeeName' && (
+                <>
+                  <h2>Enter Employee Name</h2>
+                  <input 
+                    type="text"
+                    value={searchFilters.employeeName}
+                    onChange={(e) => setSearchFilters(prev => ({ ...prev, employeeName: e.target.value }))}
+                  />
+                  <button 
+                    className={styles.doneButton}
+                    onClick={() => handleApplySearch('employeeName', { employeeName: searchFilters.employeeName })}
+                  >
+                    Done
+                  </button>
+                </>
+              )}
 
-        {activePopup === 'calendar' && (
-          <>
-            <h2>Enter Dates</h2>
-            <div className={styles.dateSection}>
-              <h3>Start Date</h3>
-              <input 
-                type="date"
-                value={searchFilters.startDate}
-                onChange={(e) => setSearchFilters(prev => ({ ...prev, startDate: e.target.value }))}
-              />
-              <h3>End Date</h3>
-              <input 
-                type="date"
-                value={searchFilters.endDate}
-                onChange={(e) => setSearchFilters(prev => ({ ...prev, endDate: e.target.value }))}
-              />
+              {activePopup === 'calendar' && (
+                <>
+                  <h2>Enter Dates</h2>
+                  <div className={styles.dateSection}>
+                    <h3>Start Date</h3>
+                    <input 
+                      type="date"
+                      value={searchFilters.startDate}
+                      onChange={(e) => setSearchFilters(prev => ({ ...prev, startDate: e.target.value }))}
+                    />
+                    <h3>End Date</h3>
+                    <input 
+                      type="date"
+                      value={searchFilters.endDate}
+                      onChange={(e) => setSearchFilters(prev => ({ ...prev, endDate: e.target.value }))}
+                    />
+                  </div>
+                  <button 
+                    className={styles.doneButton}
+                    onClick={() => handleApplySearch('calendar', { 
+                      startDate: searchFilters.startDate,
+                      endDate: searchFilters.endDate 
+                    })}
+                  >
+                    Done
+                  </button>
+                </>
+              )}
+
+              {activePopup === 'leaveType' && (
+                <>
+                  <h2>Select Leave Type</h2>
+                  <select 
+                    value={searchFilters.leaveType}
+                    onChange={(e) => setSearchFilters(prev => ({ ...prev, leaveType: e.target.value }))}
+                  >
+                    <option value="">Select...</option>
+                    <option value="Half Day">Half Day</option>
+                    <option value="Full Day">Full Day</option>
+                    <option value="Restricted Holiday">Restricted Holiday</option>
+                    <option value="Compensatory Off">Compensatory Off</option>
+                  </select>
+                  <button 
+                    className={styles.doneButton}
+                    onClick={() => handleApplySearch('leaveType', { leaveType: searchFilters.leaveType })}
+                  >
+                    Done
+                  </button>
+                </>
+              )}
             </div>
-            <button 
-              className={styles.doneButton}
-              onClick={() => handleApplySearch('calendar', { 
-                startDate: searchFilters.startDate,
-                endDate: searchFilters.endDate 
-              })}
-            >
-              Done
-            </button>
-          </>
+          </div>
         )}
-
-        {activePopup === 'leaveType' && (
-          <>
-            <h2>Select Leave Type</h2>
-            <select 
-              value={searchFilters.leaveType}
-              onChange={(e) => setSearchFilters(prev => ({ ...prev, leaveType: e.target.value }))}
-            >
-              <option value="">Select...</option>
-              <option value="Half Day">Half Day</option>
-              <option value="Full Day">Full Day</option>
-              <option value="Restricted Holiday">Restricted Holiday</option>
-              <option value="Compensatory Off">Compensatory Off</option>
-            </select>
-            <button 
-              className={styles.doneButton}
-              onClick={() => handleApplySearch('leaveType', { leaveType: searchFilters.leaveType })}
-            >
-              Done
-            </button>
-          </>
-        )}
-      </div>
-    </div>
-  )}
       </main>
     </div>
   );

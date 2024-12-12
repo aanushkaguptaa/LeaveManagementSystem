@@ -12,6 +12,7 @@ const TopNavBar = ({ user }) => {
   const handleSignOut = () => {
     setShowDropdown(false);
     logout();
+    router.push('/auth/login'); // Redirect to the login page
   };
 
   const handleHclLogoClick = useCallback(() => {

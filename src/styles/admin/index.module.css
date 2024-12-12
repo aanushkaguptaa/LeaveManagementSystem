@@ -103,6 +103,14 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
+  transition: all 0.2s ease;
+  border: 2px solid transparent;
+}
+
+.card:hover {
+  transform: scale(1.02);
+  border-color: #0056b3;
+  box-shadow: 0 12px 32px rgba(72, 89, 102, 0.15);
 }
 
 .cardContent {
@@ -128,5 +136,36 @@ body {
 .cardIcon {
   width: 28px;
   height: 28px;
+}
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 1rem;
+  padding: 1rem 0;
+}
+
+.pagination button {
+  padding: 0.5rem 1rem;
+  border: 1px solid #dee2e6;
+  background-color: white;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.pagination button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.pagination button:hover:not(:disabled) {
+  background-color: #f8f9fa;
+}
+
+.pagination span {
+  color: #6c757d;
 }
 

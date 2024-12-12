@@ -26,7 +26,13 @@ const LeaveRequestSchema = new mongoose.Schema({
   SAPID: {
     type: String,
     required: true,
-    ref: 'Employee'
+    ref: 'Employee',
+    validate: {
+      validator: function(v) {
+        return /^\d{8}$/.test(v);
+      },
+      message: props => `${props.value} is not a valid SAP ID!`
+    }
   },
   reason: {
     type: String,

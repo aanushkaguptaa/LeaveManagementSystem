@@ -2,6 +2,7 @@ import { useState } from 'react';
 import TopNavBar from '@/components/TopNavBar';
 import SideNavBar from '@/components/user/SideNavBar';
 import styles from '@/styles/user/history.module.css';
+import ProtectedRoute from '@/components/ProtectedRoute';
 
 const History = () => {
   const [user] = useState({
@@ -213,4 +214,10 @@ const History = () => {
   );
 };
 
-export default History;
+export default function UserPage() {
+  return (
+    <ProtectedRoute>
+      <History />
+    </ProtectedRoute>
+  );
+}

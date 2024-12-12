@@ -4,14 +4,17 @@ import TopNavBar from '../../src/components/TopNavBar';
 import SideNavBar from '../../src/components/admin/SideNavBar'; 
 import Card from '../../src/components/admin/Card';
 import { useRouter } from 'next/router';
-
+import ProtectedRoute from '@/components/ProtectedRoute';
 
 const SCREEN2ADP = () => {
   const router = useRouter(); 
-  const [user, setUser] = useState({
-    name: "Admin", // Default value for testing
-    email: "admin@domain.com", // Default value for testing
-    profilePicture: "/profile.png" // Default value for testing
+  const [user, setUser] = useState(() => {
+    const storedUser = localStorage.getItem('user');
+    return storedUser ? JSON.parse(storedUser) : {
+      name: "",
+      sapId: "",
+      role: ""
+    };
   });
 
   const [leaveData, setLeaveData] = useState({
@@ -121,12 +124,12 @@ const SCREEN2ADP = () => {
             <tbody>
               {/* Example data, replace with dynamic data */}
               <tr>
-                <td>12345</td>
+                <td>12345678</td>
                 <td>John Doe</td>
                 <td>Full Leave</td>
               </tr>
               <tr>
-                <td>67890</td>
+                <td>67890567</td>
                 <td>Jane Smith</td>
                 <td>Half Leave</td>
               </tr>
@@ -138,4 +141,10 @@ const SCREEN2ADP = () => {
   );
 };
 
-export default SCREEN2ADP;
+export default function AdminPage() {
+  return (
+    <ProtectedRoute adminOnly>
+      <SCREEN2ADP />
+    </ProtectedRoute>
+  );
+}

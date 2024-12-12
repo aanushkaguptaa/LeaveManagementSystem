@@ -2,14 +2,16 @@ import React, { useState, useCallback } from 'react';
 import Image from 'next/image';
 import styles from '../styles/TopNavBar.module.css';
 import { useRouter } from 'next/router';
+import { useAuth } from '../contexts/AuthContext';
 
 const TopNavBar = ({ user }) => {
+  const { logout } = useAuth();
   const [showDropdown, setShowDropdown] = useState(false);
   const router = useRouter();
 
   const handleSignOut = () => {
-    setShowDropdown(false); // Close dropdown
-    router.push('/login'); // Redirect to main login page
+    setShowDropdown(false);
+    logout();
   };
 
   const handleHclLogoClick = useCallback(() => {
@@ -55,7 +57,7 @@ const TopNavBar = ({ user }) => {
           />
           <div className={styles.adminAdmindomainin}>
             <p className={styles.p}>{user.name}</p>
-            <p className={styles.p}>{user.email}</p>
+            <p className={styles.p}>{user.sapId}</p>
           </div>
         </button>
         
@@ -72,7 +74,7 @@ const TopNavBar = ({ user }) => {
                 />
                 <div className={styles.dropdownUserInfo}>
                   <p>{user.name}</p>
-                  <p>{user.email}</p>
+                  <p>{user.sapId}</p>
                 </div>
               </div>
               <button className={styles.signOutButton} onClick={handleSignOut}>

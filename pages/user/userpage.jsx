@@ -4,13 +4,11 @@ import SideNavBar from '@/components/user/SideNavBar';
 import LeaveCardsGrid from '@/components/user/LeaveCardGrid';
 import LeaveRequestsTable from '@/components/user/LeaveRequestsTable';
 import styles from '@/styles/user/userpage.module.css';
+import ProtectedRoute from '@/components/ProtectedRoute';
+import { useAuth } from '@/contexts/AuthContext';
 
 const UserDashboard = () => {
-  const [user] = useState({
-    name: "User",
-    email: "user@domain.com",
-    profilePicture: "/profile.png"
-  });
+  const { user } = useAuth();
 
   const [showDeletePopup, setShowDeletePopup] = useState(false);
   const [deleteRequestId, setDeleteRequestId] = useState(null);
@@ -210,4 +208,10 @@ const UserDashboard = () => {
   );
 };
 
-export default UserDashboard;
+export default function UserPage() {
+  return (
+    <ProtectedRoute>
+      <UserDashboard />
+    </ProtectedRoute>
+  );
+}

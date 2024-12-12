@@ -40,5 +40,5 @@ const EmployeeSchema = new mongoose.Schema({
     timestamps: true
   });
 
-
-module.exports = mongoose.model('Employee', EmployeeSchema);
+// Check if the model exists before compiling it
+module.exports = mongoose.models.Employee || mongoose.model('Employee', EmployeeSchema);

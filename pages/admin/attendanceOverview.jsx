@@ -3,6 +3,7 @@ import styles from '../../src/styles/admin/overview.module.css';
 import TopNavBar from '../../src/components/TopNavBar'; 
 import SideNavBar from '../../src/components/admin/SideNavBar'; 
 import { useRouter } from 'next/router';
+import ProtectedRoute from '@/components/ProtectedRoute';
 
 const SCREEN1ADP = () => {
   const [user, setUser] = useState({
@@ -214,4 +215,10 @@ const SCREEN1ADP = () => {
   );
 };
 
-export default SCREEN1ADP;
+export default function AdminPage() {
+  return (
+    <ProtectedRoute adminOnly>
+      <SCREEN1ADP />
+    </ProtectedRoute>
+  );
+}

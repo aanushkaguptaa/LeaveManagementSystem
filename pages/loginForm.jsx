@@ -2,40 +2,95 @@
 import React, { useState } from 'react';
 import styles from '@/styles/Home.module.css';
 import { useRouter, useSearchParams } from 'next/navigation';
+import Cookies from 'js-cookie';
+import { useAuth } from '@/contexts/AuthContext';
 
 export default function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const type = searchParams.get('type');
+  const { setUser } = useAuth();
   
   const [formData, setFormData] = useState({
-    email: '',
+    sapId: '',
     password: ''
   });
+  const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+
+  const validateSapId = (sapId) => {
+    return /^\d{8}$/.test(sapId);
+  };
 
   const isFormValid = () => {
-    if (type === 'admin') {
-      return formData.email.trim() !== '' && formData.password.trim() !== '';
+    if (!validateSapId(formData.sapId)) {
+      return false;
     }
-    return formData.email.trim() !== ''; // For user, only SAP ID is required
+    if (type === 'admin') {
+      return formData.password.trim() !== '';
+    }
+    return true;
   };
 
   const handleInputChange = (e) => {
     const { id, value } = e.target;
+    if (id === 'sapId' && !/^\d{0,8}$/.test(value)) {
+      return;
+    }
     setFormData(prev => ({
       ...prev,
       [id]: value
     }));
+    setError('');
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!isFormValid()) return;
     
-    if (type === 'admin') {
-      router.push('/admin/adminpage');
-    } else {
-      router.push('/user/userpage');
+    setIsLoading(true);
+    setError('');
+
+    try {
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          sapId: formData.sapId,
+          password: formData.password,
+          type
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || 'Authentication failed');
+      }
+
+      // Store token in cookie
+      Cookies.set('token', data.token, { expires: 1 });
+      
+      // Store user info in localStorage
+      localStorage.setItem('user', JSON.stringify(data.user));
+      
+      // Update auth context
+      setUser(data.user);
+
+      // If admin login was successful, redirect to admin page
+      if (type === 'admin' && data.user.role === 'admin') {
+        router.push('/admin/adminpage');
+      } else {
+        // Otherwise redirect to user page
+        router.push('/user/userpage');
+      }
+
+    } catch (error) {
+      setError(error.message || 'Failed to login');
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -57,19 +112,24 @@ export default function LoginForm() {
 
         <div className={styles.loginBox}>
           <form className={styles.form} onSubmit={handleSubmit}>
+            {error && <div className={styles.error}>{error}</div>}
+            
             <div className={styles.formGroup}>
-              <label htmlFor="email" className={styles.label}>
-                {type === 'admin' ? 'Email' : 'SAP ID'}
+              <label htmlFor="sapId" className={styles.label}>
+                SAP ID
               </label>
               <input
-                type={type === 'admin' ? 'email' : 'text'}
-                id="email"
+                type="text"
+                id="sapId"
                 className={styles.input}
-                placeholder={type === 'admin' ? 'Enter your email' : 'Enter your SAP ID'}
+                placeholder="Enter your 8-digit SAP ID"
                 required
-                value={formData.email}
+                value={formData.sapId}
                 onChange={handleInputChange}
                 autoComplete="off"
+                maxLength="8"
+                pattern="\d{8}"
+                title="Please enter an 8-digit SAP ID"
               />
             </div>
             
@@ -94,9 +154,9 @@ export default function LoginForm() {
             <button 
               type="submit" 
               className={styles.button}
-              disabled={!isFormValid()}
+              disabled={!isFormValid() || isLoading}
             >
-              {type === 'admin' ? 'Sign In' : 'Continue'}
+              {isLoading ? 'Loading...' : (type === 'admin' ? 'Sign In' : 'Continue')}
             </button>
           </form>
         </div>

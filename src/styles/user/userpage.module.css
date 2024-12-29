@@ -114,115 +114,122 @@
 }
 /* ... existing styles ... */
 
-.overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: rgba(212, 219, 252, 0.5); 
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 1000;
+.popupOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(72, 89, 102, 0.1);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
 }
 
 .popup {
-    background: white;
-    padding: 32px;
-    border-radius: 12px;
-    min-width: 400px;
-    position: relative;
-    min-height: 25px;
-    box-shadow: 0 8px 28px rgba(72, 89, 102, 0.1); 
+  background: white;
+  border-radius: 12px;
+  padding: 20px;
+  width: 100%;
+  max-width: 30%;
+  position: relative;
+  box-shadow: 0 8px 28px rgba(72, 89, 102, 0.1);
+  font-family: "Lexend", sans-serif;
+}
+
+.popupHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #eee;
+}
+
+.popupHeader h2 {
+  margin: 0;
+  font-size: 1.3rem;
+  color: #727272;
+  font-family: "Lexend", sans-serif;
 }
 
 .closeButton {
-    position: absolute;
-    right: 16px;
-    top: 16px;
-    background: none;
-    border: none;
-    font-size: 30px;
-    font-weight: 600;
-    color: #3354F4;
-    cursor: pointer;
-    padding: 4px;
+  background: none;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+  color: #727272;
+  padding: 4px;
+  font-family: "Lexend", sans-serif;
 }
 
-.doneButton {
-    position: absolute;
-    right: 32px;
-    bottom: 20px;
-    padding: 8px 28px;
-    background-color: #3354F4;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-family: "Lexend", sans-serif;
+.popupContent {
+  display: flex;
+  flex-direction: column;
+  
 }
 
-/* Standardize all inputs and selects */
-/* Find and modify these styles */
-.popup input,
-.popup select,
-.popup textarea {
-    width: 100%;          /* Changed from calc(100% - 32px) */
-    padding: 12px 12px;
-    margin-bottom: 3px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    color: #727272;
-    font-family: "Lexend", sans-serif;
-    font-size: 14px;
-    box-sizing: border-box;  /* Added this to include padding in width calculation */
+.formGroup {
+  display: flex;
+  flex-direction: column;
+  
 }
 
-/* If you have any specific select styles, modify them to match */
-.popup select {
-    appearance: none;  /* Keeps this if you had it */
-    background: url("data:image/svg+xml,<svg height='10px' width='10px' viewBox='0 0 16 16' fill='%23727272' xmlns='http://www.w3.org/2000/svg'><path d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/></svg>") no-repeat;
-    background-position: calc(100% - 16px) center;
-    background-color: white;
-    cursor: pointer;
-    padding-right: 40px;  /* Space for the dropdown arrow */
-}
-/* Focus states for both input and select */
-.popup input:focus,
-.popup select:focus {
-    outline: none;
-    border-color: #3354F4;
-    box-shadow: 0 0 0 1px #3354F4;
+.formGroup label {
+  font-weight: 500;
+  color: #727272;
+  font-size: 0.9rem;
+  font-family: "Lexend", sans-serif;
+  margin-bottom: 4px;
 }
 
-/* Calendar input specific styles */
-.popup input[type="date"]::-webkit-calendar-picker-indicator {
-    cursor: pointer;
-    filter: invert(26%) sepia(89%) saturate(1583%) hue-rotate(223deg) brightness(98%) contrast(94%);
+.formGroup input,
+.formGroup select {
+  width: 100%;
+  height: 38px;
+  padding: 8px 10px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  font-family: "Lexend", sans-serif;
+  box-sizing: border-box;
 }
 
-.popup h2 {
-    color: #727272;
-    margin-bottom: 24px;
-    font-size: 20px;
-    font-weight: 400;
-    font-family: "Lexend", sans-serif;
+.dateContainer {
+  display: flex;
+  flex-direction: column;
 }
 
-.popup h3 {
-    color: #727272;
-    margin-top: 24px;
-    margin-bottom: 8px;
-    font-size: 14px;
-    font-family: "Lexend", sans-serif;
+.submitButton {
+  background-color: #3354F4;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 10px;
+  height: 38px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  margin-top: 8px;
+  font-family: "Lexend", sans-serif;
 }
 
-.dateSection {
-    margin: 24px 0;
+.submitButton:hover:not(.disabled) {
+  background-color: #2842c3;
 }
 
-/* ... existing styles ... */
+.submitButton.disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
+}
+
+.formGroup input:focus,
+.formGroup select:focus {
+  outline: none;
+  border-color: #3354F4;
+  box-shadow: 0 0 0 2px rgba(51, 84, 244, 0.1);
+}
 
 .deletePopup {
     min-width: 50px;
@@ -284,9 +291,7 @@
     margin-top: 0;
 }
 
-.popup input:last-of-type {
-    margin-bottom: 48px;
-}
+
 /* Add these new styles for the done button */
 .doneButton {
   position: absolute;
@@ -313,3 +318,29 @@
 }
 
 /* Rest of your existing CSS remains the same */
+
+.popup h3 {
+  margin-top: 24px;
+  margin-bottom: 8px;
+}
+
+.popup input,
+.popup select {
+  width: 100%;
+  padding: 8px;
+  margin-bottom: 24px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.dateSection {
+  margin-bottom: 0;
+}
+
+.dateSection h3 {
+  margin-top: 16px;
+}
+
+.dateSection input {
+  margin-bottom: 16px;
+}

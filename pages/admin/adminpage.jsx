@@ -43,7 +43,7 @@ const SCREEN2ADP = () => {
     const fetchDashboardData = async () => {
       try {
         setIsLoading(true);
-        const response = await fetch(`/api/adminpage?page=${currentPage}&limit=${itemsPerPage}`);
+        const response = await fetch(`/api/admin/adminpage?page=${currentPage}&limit=${itemsPerPage}`);
         const data = await response.json();
         if (response.ok) {
           setLeaveData(data.leaveData);

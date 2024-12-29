@@ -51,7 +51,7 @@ const SCREEN1ADP = () => {
           limit: itemsPerPage
         }).toString();
         
-        const response = await fetch(`/api/attendanceOverview?${queryParams}`);
+        const response = await fetch(`/api/admin/attendanceOverview?${queryParams}`);
         const data = await response.json();
         
         setAttendanceData(data.requests);
@@ -84,17 +84,40 @@ const SCREEN1ADP = () => {
     setCurrentPage(newPage);
   };
 
-  const handleExportClick = () => {
-    const exportData = attendanceData.map(item => ({
-      'SAP ID': item.sapId,
-      'Employee Name': item.employeeName,
-      'Leave Type': item.leaveType,
-      'From Date': item.leaveRequestDateFrom,
-      'To Date': item.leaveRequestDateTo,
-      'Requested On': item.leaveRequestedOn
-    }));
+
+  const handleExportClick = async () => {
+    try {
+      const queryParams = new URLSearchParams({
+        ...searchFilters,
+        limit: '0'
+      }).toString();
+      
+      const response = await fetch(`/api/admin/attendanceOverview?${queryParams}`);
+      if (!response.ok) {
+        throw new Error('Failed to fetch data');
+      }
+      
+      const data = await response.json();
+      
+      if (!data.requests || data.requests.length === 0) {
+        alert('No data available to export');
+        return;
+      }
+  
+      const exportData = data.requests.map(item => ({
+        'SAP ID': item.sapId,
+        'Employee Name': item.employeeName,
+        'Leave Type': item.leaveType,
+        'From Date': item.leaveRequestDateFrom,
+        'To Date': item.leaveRequestDateTo,
+        'Requested On': item.leaveRequestedOn
+      }));
     
-    exportToExcel(exportData, 'attendance_overview');
+      await exportToExcel(exportData, 'attendance_overview');
+    } catch (error) {
+      console.error('Export error:', error);
+      alert('Failed to export data');
+    }
   };
 
   return (
@@ -114,10 +137,32 @@ const SCREEN1ADP = () => {
             <div className={styles.searchSection}>
               <span className={styles.searchLabel}>Search By:</span>
               <div className={styles.searchButtons}>
-                <button className={styles.searchButton} onClick={() => handleSearchClick('sapId')}>SAP-ID</button>
-                <button className={styles.searchButton} onClick={() => handleSearchClick('employeeName')}>Employee-Name</button>
-                <button className={styles.searchButton} onClick={() => handleSearchClick('calendar')}>Calendar</button>
-                <button className={styles.searchButton} onClick={() => handleSearchClick('leaveType')}>Leave Type</button>
+                <button 
+                  className={`${styles.searchButton} ${searchFilters.sapId ? styles.active : ''}`}
+                  onClick={() => searchFilters.sapId ? setSearchFilters(prev => ({ ...prev, sapId: '' })) : handleSearchClick('sapId')}
+                >
+                  SAP-ID
+                </button>
+                <button 
+                  className={`${styles.searchButton} ${searchFilters.employeeName ? styles.active : ''}`}
+                  onClick={() => searchFilters.employeeName ? setSearchFilters(prev => ({ ...prev, employeeName: '' })) : handleSearchClick('employeeName')}
+                >
+                  Employee-Name
+                </button>
+                <button 
+                  className={`${styles.searchButton} ${(searchFilters.startDate || searchFilters.endDate) ? styles.active : ''}`}
+                  onClick={() => (searchFilters.startDate || searchFilters.endDate) ? 
+                    setSearchFilters(prev => ({ ...prev, startDate: '', endDate: '' })) : 
+                    handleSearchClick('calendar')}
+                >
+                  Calendar
+                </button>
+                <button 
+                  className={`${styles.searchButton} ${searchFilters.leaveType ? styles.active : ''}`}
+                  onClick={() => searchFilters.leaveType ? setSearchFilters(prev => ({ ...prev, leaveType: '' })) : handleSearchClick('leaveType')}
+                >
+                  Leave Type
+                </button>
               </div>
             </div>
           </div>
@@ -149,6 +194,7 @@ const SCREEN1ADP = () => {
                   <th>Leave Request Date From</th>
                   <th>Leave Request Date To</th>
                   <th>Leave Requested On</th>
+                  <th>Cancelled</th>
                 </tr>
               </thead>
               <tbody>
@@ -160,6 +206,7 @@ const SCREEN1ADP = () => {
                     <td>{item.leaveRequestDateFrom}</td>
                     <td>{item.leaveRequestDateTo}</td>
                     <td>{item.leaveRequestedOn}</td>
+                    <td>{item.cancelled}</td>
                   </tr>
                 ))}
               </tbody>

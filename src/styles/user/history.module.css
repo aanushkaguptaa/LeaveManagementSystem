@@ -18,6 +18,7 @@
   color: #333;
   font-size: 24px;
   margin-bottom: 24px;
+  font-family: "Lexend", sans-serif;
 }
 
 .tableContainer {
@@ -34,7 +35,7 @@
   align-items: center;
 }
 
-.exportButton {
+.exportButton, .searchButton {
   padding: 8px 16px;
   background-color: #007bff;
   color: white;
@@ -45,13 +46,15 @@
   transition: background-color 0.2s;
 }
 
-.exportButton:hover {
+.exportButton:hover, .searchButton:hover {
   background-color: #0056b3;
 }
+
 .historyTable {
   width: 100%;
   border-collapse: separate;
   border-spacing: 0;
+  font-family: "Lexend", sans-serif;
 }
 
 .historyTable th,
@@ -59,6 +62,7 @@
   padding: 12px 16px;
   text-align: left;
   border-bottom: 1px solid #dee2e6;
+  font-family: "Lexend", sans-serif;
 }
 
 .historyTable th {
@@ -74,183 +78,146 @@
 .historyTable tbody tr:last-child td {
   border-bottom: none;
 }
-/* Add this to src/styles/user/history.module.css */
-.exportButton {
-display: inline-flex;
-align-items: center;
-padding: 12px 24px;
-background-color: #007bff;
-color: white;
-border: 1px solid #3354F4;
-border-radius: 8px;
-cursor: pointer;
-font-family: "Lexend", sans-serif;
-font-size: 14px;
-transition: background-color 0.2s;
-box-shadow: 0 4px 6px rgba(0, 123, 255, 0.25);
-width: auto; /* Allow width to adjust */
+
+.loading {
+  text-align: center;
+  padding: 20px;
+  color: #727272;
+  font-family: "Lexend", sans-serif;
 }
 
-.exportButton:hover {
-background-color: #0056b3;
-}
-
-/* Responsive styles */
-@media (max-width: 768px) {
-.exportButton {
-  padding: 10px 20px; /* Adjust padding for smaller screens */
-  font-size: 12px; /* Smaller font size */
-}
-}
-
-@media (max-width: 480px) {
-.exportButton {
-  padding: 8px 16px; /* Further adjust padding for very small screens */
-  font-size: 10px; /* Even smaller font size */
-}
-}
-/* Existing styles ... */
-
-/* Positioning the table actions */
-.tableActions {
-display: flex;
-justify-content: space-between; /* Space between items */
-align-items: center;
-margin-bottom: 24px;
-}
-
-/* Export button styles */
-.exportButton {
-padding: 8px 16px;
-background-color: #007bff;
-color: white;
-border: none;
-border-radius: 6px;
-cursor: pointer;
-font-family: "Lexend", sans-serif;
-transition: background-color 0.2s;
-}
-
-/* Search button styles */
 .searchButton {
-padding: 8px 16px;
-background-color: #007bff;
-color: white;
-border: none;
-border-radius: 6px;
-cursor: pointer;
-font-family: "Lexend", sans-serif;
-transition: background-color 0.2s;
+  display: inline-flex;
+  align-items: center;
+  padding: 8px 16px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-family: "Lexend", sans-serif;
+  font-size: 14px;
+  transition: all 0.2s;
 }
 
-/* Positioning the search buttons in the rightmost corner */
-.searchSection {
-display: flex;
-justify-content: flex-end; /* Align items to the right */
-align-items: center;
+.searchButton.active {
+  background-color: #e9ecef;
+  color: #495057;
+  padding-right: 8px;
 }
 
-/* Adjusting the spacing between SAP-ID and Calendar buttons */
-.searchSection .sapIdButton {
-margin-right: 24px; /* 24 pixels gap between SAP-ID and Calendar */
+.searchButton.active::after {
+  content: "×";
+  margin-left: 8px;
+  font-size: 18px;
+  font-weight: bold;
 }
 
 .searchButton:hover {
-background-color: #0056b3;
+  background-color: #0056b3;
 }
 
-/* Popup styles */
-.overlay {
-position: fixed;
-top: 0;
-left: 0;
-right: 0;
-bottom: 0;
-background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent background */
-display: flex;
-justify-content: center; /* Center horizontally */
-align-items: center; /* Center vertically */
-z-index: 1000; /* Ensure it appears above other content */
+.searchButton.active:hover {
+  background-color: #dee2e6;
 }
 
-/* Popup styles */
-.popup {
-background-color: white;
-border-radius: 12px; /* Adjusted for consistency */
-padding: 24px; /* Adjusted for consistency */
-box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Adjusted for consistency */
-width: 400px; /* Set a fixed width for the popup */
-max-width: 90%; /* Responsive max width */
-}
-
-/* Close button styles */
-.closeButton {
-position: absolute;
-right: 16px;
-top: 16px;
-background: none;
-border: none;
-font-size: 30px; /* Increased for better visibility */
-font-weight: 600;
-color: #3354F4;
-cursor: pointer;
-padding: 4px;
-}
-
-/* Done button styles */
 .doneButton {
-padding: 8px 16px;
-background-color: #007bff;
-color: white;
-border: none;
-border-radius: 6px;
-cursor: pointer;
-transition: background-color 0.2s;
+  padding: 8px 12px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-family: "Lexend", sans-serif;
+  font-size: 14px;
+  transition: background-color 0.2s;
 }
 
 .doneButton:hover {
-background-color: #0056b3;
+  background-color: #0056b3;
 }
 
-/* Input and select styles */
+.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(212, 219, 252, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.popup {
+    background: white;
+    padding: 32px;
+    border-radius: 8px;
+    min-width: 400px;
+    position: relative;
+    min-height: 250px;
+}
+
+.closeButton {
+    position: absolute;
+    right: 16px;
+    top: 16px;
+    background: none;
+    border: none;
+    font-size: 30px;
+    font-weight: 600;
+    color: #3354F4;
+    cursor: pointer;
+    padding: 4px;
+}
+
+.doneButton {
+    position: absolute;
+    right: 32px;
+    bottom: 32px;
+    padding: 8px 24px;
+    background-color: #3354F4;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-family: "Lexend", sans-serif;
+}
+
+/* Standardize all inputs and selects */
 .popup input,
 .popup select {
-width: calc(100% - 32px);
-padding: 12px 16px;
-margin: 8px 0 24px 0;
-border: 1px solid #ddd;
-border-radius: 4px;
-color: #727272;
-font-family: "Lexend", sans-serif;
-font-size: 14px;
+    width: calc(100% - 32px);
+    padding: 12px 16px;
+    margin: 8px 0 24px 0;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    color: #727272;
+    font-family: "Lexend", sans-serif;
+    font-size: 14px;
 }
 
-/* Focus states for both input and select */
-.popup input:focus,
-.popup select:focus {
-outline: none;
-border-color: #3354F4;
-box-shadow: 0 0 0 1px #3354F4;
+/* Calendar input specific styles */
+.popup input[type="date"]::-webkit-calendar-picker-indicator {
+    cursor: pointer;
+    filter: invert(26%) sepia(89%) saturate(1583%) hue-rotate(223deg) brightness(98%) contrast(94%);
 }
 
-/* Additional styles for headings */
 .popup h2 {
-color: #727272;
-margin-bottom: 24px;
-font-size: 20px;
-font-weight: 400;
-font-family: "Lexend", sans-serif;
+    color: #727272;
+    margin-bottom: 24px;
+    font-size: 20px;
+    font-weight: 400;
+    font-family: "Lexend", sans-serif;
 }
 
 .popup h3 {
-color: #727272;
-margin: 8px 0;
-font-size: 14px;
+    color: #727272;
+    margin: 8px 0;
+    font-size: 14px;
 }
 
-/* Date section styles */
 .dateSection {
-margin: 20px 0 60px 0;
+    margin: 20px 0 60px 0;
 }
-
-/* ... existing styles ... */

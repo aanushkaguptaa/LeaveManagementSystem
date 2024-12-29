@@ -95,11 +95,38 @@
   }
 
 .searchButton {
+    display: inline-flex;
+    align-items: center;
+    padding: 8px 16px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-family: "Lexend", sans-serif;
+    font-size: 14px;
     transition: all 0.2s;
+}
+
+.searchButton.active {
+    background-color: #e9ecef;
+    color: #495057;
+    padding-right: 8px;
+}
+
+.searchButton.active::after {
+    content: "×";
+    margin-left: 8px;
+    font-size: 18px;
+    font-weight: bold;
 }
 
 .searchButton:hover {
     background-color: #0056b3;
+}
+
+.searchButton.active:hover {
+    background-color: #dee2e6;
 }
   
   .exportButton:hover {

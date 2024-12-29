@@ -54,7 +54,7 @@ const TopNavBar = ({ user }) => {
             width={35}
             height={35}
             alt="Admin Profile"
-            src={user.profilePicture || "/admin-profile.png"}
+            src={user.profilePicture || "/profile.png"}
           />
           <div className={styles.adminAdmindomainin}>
             <p className={styles.p}>{user.name}</p>

@@ -1,10 +1,12 @@
 import styles from '@/styles/user/LeaveCard.module.css';
 
-const LeaveCard = ({ title, remainingLeaves, usedLeaves, totalLeaves, iconSrc, altText }) => {
-  const percentage = (usedLeaves / totalLeaves) * 100;
+const LeaveCard = ({ title, usedLeaves = 0, totalLeaves = 0, tooltipText }) => {
+  const safeUsedLeaves = Number(usedLeaves) || 0;
+  const safeTotalLeaves = Number(totalLeaves) || 0;
+  const percentage = (safeUsedLeaves / safeTotalLeaves) * 100 || 0;
 
   return (
-    <div className={styles.card}>
+    <div className={styles.card} title={tooltipText}>
       <h3 className={styles.cardTitle}>{title}</h3>
       <div className={styles.cardStats}>
         <div className={styles.progressCircle} style={{ '--percentage': percentage }}>
@@ -24,34 +26,28 @@ const LeaveCard = ({ title, remainingLeaves, usedLeaves, totalLeaves, iconSrc, a
               fill="none"
               className={styles.circleProgress}
               strokeDasharray={`${2 * Math.PI * 40}`}
-              strokeDashoffset={`${2 * Math.PI * 40}`} // This will be overridden on hover
+              strokeDashoffset={`${2 * Math.PI * 40}`}
               transform="rotate(-90 50 50)"
             />
-            {/* Combined text element */}
             <text
               x="50"
               y="50"
               textAnchor="middle"
               dominantBaseline="middle"
               className={styles.progressText}
-              style={{ fontSize: '16px' }} // Adjust font size if needed
             >
-              {`${usedLeaves}/${totalLeaves}`}
+              {`${safeUsedLeaves}/${safeTotalLeaves}`}
             </text>
           </svg>
         </div>
         <div className={styles.leaveStats}>
           <div className={styles.statItem}>
-            <span className={styles.statLabel}>Remaining</span>
-            <span className={`${styles.statValue} ${styles.remainingValue}`}>{remainingLeaves}</span>
-          </div>
-          <div className={styles.statItem}>
             <span className={styles.statLabel}>Used</span>
-            <span className={`${styles.statValue} ${styles.usedValue}`}>{usedLeaves}</span>
+            <span className={`${styles.statValue} ${styles.usedValue}`}>{safeUsedLeaves}</span>
           </div>
           <div className={styles.statItem}>
             <span className={styles.statLabel}>Total</span>
-            <span className={`${styles.statValue} ${styles.totalValue}`}>{totalLeaves}</span>
+            <span className={`${styles.statValue} ${styles.totalValue}`}>{safeTotalLeaves}</span>
           </div>
         </div>
       </div>

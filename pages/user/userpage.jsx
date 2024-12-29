@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import TopNavBar from '@/components/TopNavBar';
 import SideNavBar from '@/components/user/SideNavBar';
 import LeaveCardsGrid from '@/components/user/LeaveCardGrid';
@@ -9,6 +9,13 @@ import { useAuth } from '@/contexts/AuthContext';
 
 const UserDashboard = () => {
   const { user } = useAuth();
+
+  const tooltipTexts = {
+    halfLeave: "Off-shore employees can have first half off and On-shore employees the second respectively",
+    fullLeave: "Regular full day leave",
+    rhLeave: "Restricted Holiday - can be taken on specific dates only",
+    compOffLeave: "Compensatory Off - leave granted for working on holidays/weekends"
+  };
 
   const [showDeletePopup, setShowDeletePopup] = useState(false);
   const [deleteRequestId, setDeleteRequestId] = useState(null);
@@ -30,48 +37,57 @@ const UserDashboard = () => {
     );
   };
 
-  const [leaveStats] = useState({
+  const [activeRequests, setActiveRequests] = useState([]);
+  const [leaveStats, setLeaveStats] = useState({
     fullLeave: {
-      remainingLeaves: 10,
-      usedLeaves: 5,
+      usedLeaves: 0,
       totalLeaves: 15
     },
     halfLeave: {
-      remainingLeaves: 8,
-      usedLeaves: 2,
+      usedLeaves: 0,
       totalLeaves: 10
     },
     rhLeave: {
-      remainingLeaves: 3,
       usedLeaves: 0,
-      totalLeaves: 3
+      totalLeaves: 5
     },
-    compOff: {
-      remainingLeaves: 5,
-      usedLeaves: 1,
-      totalLeaves: 6
+    compOffLeave: {
+      usedLeaves: 0,
+      totalLeaves: 2
     }
   });
-
-  const [leaveRequests] = useState([
-    {
-      id: 'REQ001',
-      dateSent: '15 March 2024',
-      type: 'Full Leave',
-      fromDate: '20 March 2024',
-      toDate: '21 March 2024'
-    }
-  ]);
 
   const handleDeleteClick = (requestId) => {
     setDeleteRequestId(requestId);
     setShowDeletePopup(true);
   };
 
-  const handleConfirmDelete = () => {
-    console.log('Deleting request:', deleteRequestId);
-    setShowDeletePopup(false);
-    setDeleteRequestId(null);
+  const handleConfirmDelete = async () => {
+    try {
+      console.log('Cancelling request:', deleteRequestId);
+      const response = await fetch('/api/user/cancelRequest', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ 
+          requestId: parseInt(deleteRequestId, 10) 
+        }),
+      });
+
+      if (response.ok) {
+        await fetchUserData(); // Wait for the data to refresh
+        setShowDeletePopup(false);
+        setDeleteRequestId(null);
+      } else {
+        const data = await response.json();
+        console.error('Cancel failed:', data);
+        alert(data.message || 'Failed to cancel request');
+      }
+    } catch (error) {
+      console.error('Error cancelling request:', error);
+      alert('Failed to cancel request');
+    }
   };
 
   const handleCancelDelete = () => {
@@ -93,12 +109,79 @@ const UserDashboard = () => {
     });
   };
 
-  const handleSubmitLeave = () => {
+  const handleSubmitLeave = async () => {
     if (isFormValid()) {
-      console.log('Leave Request:', leaveRequest);
-      handleClosePopup();
+      try {
+        const response = await fetch('/api/user/createRequest', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            sapId: user.sapId,
+            type: leaveRequest.type,
+            from: leaveRequest.startDate,
+            to: leaveRequest.endDate,
+            reason: leaveRequest.reason
+          }),
+        });
+
+        if (response.ok) {
+          fetchUserData(); // Refresh the data
+          handleClosePopup();
+        } else {
+          const data = await response.json();
+          alert(data.message || 'Failed to create leave request');
+        }
+      } catch (error) {
+        console.error('Error creating leave request:', error);
+        alert('Failed to create leave request');
+      }
     }
   };
+
+  const fetchUserData = async () => {
+    try {
+      const response = await fetch(`/api/user/dashboard?sapId=${user.sapId}`);
+      const data = await response.json();
+      if (response.ok) {
+        setLeaveStats(data.leaveStats);
+        setActiveRequests(data.activeRequests);
+      }
+    } catch (error) {
+      console.error('Error fetching user data:', error);
+    }
+  };
+
+  const handleCancelRequest = async (requestId) => {
+    try {
+      console.log('Cancelling request:', requestId); // Debug log
+      const response = await fetch('/api/user/cancelRequest', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ 
+          requestId: parseInt(requestId, 10) 
+        }),
+      });
+
+      if (response.ok) {
+        await fetchUserData(); // Wait for the data to refresh
+      } else {
+        const data = await response.json();
+        console.error('Cancel failed:', data); // Debug log
+        alert(data.message || 'Failed to cancel request');
+      }
+    } catch (error) {
+      console.error('Error cancelling request:', error);
+      alert('Failed to cancel request');
+    }
+  };
+
+  useEffect(() => {
+    fetchUserData();
+  }, [user.sapId]);
 
   return (
     <div className={styles.dashboard}>
@@ -115,10 +198,10 @@ const UserDashboard = () => {
             </button>
           </div>
           
-          <LeaveCardsGrid leaveStats={leaveStats} />
+          <LeaveCardsGrid leaveStats={leaveStats} tooltipTexts={tooltipTexts} />
           
           <LeaveRequestsTable 
-            requests={leaveRequests}
+            requests={activeRequests}
             onDeleteRequest={handleDeleteClick}
           />
 
@@ -147,58 +230,70 @@ const UserDashboard = () => {
           )}
 
           {showLeavePopup && (
-            <div className={styles.overlay}>
+            <div className={styles.popupOverlay}>
               <div className={styles.popup}>
-                <h2>Request for Leave</h2>
-                <button className={styles.closeButton} onClick={handleClosePopup}>×</button>
-                
-                <h3>Type</h3>
-                <select 
-                  value={leaveRequest.type}
-                  onChange={(e) => setLeaveRequest({...leaveRequest, type: e.target.value})}
-                  required
-                >
-                  <option value="">Select Leave Type</option>
-                  <option value="Half Day">Half Day</option>
-                  <option value="Full Day">Full Day</option>
-                  <option value="Compensatory Off">Compensatory Off</option>
-                  <option value="Restricted Holiday">Restricted Holiday</option>
-                </select>
-
-                <div className={styles.dateSection}>
-                  <h3>Start Date</h3>
-                  <input 
-                    type="date"
-                    value={leaveRequest.startDate}
-                    onChange={(e) => setLeaveRequest({...leaveRequest, startDate: e.target.value})}
-                    required
-                  />
-
-                  <h3>End Date</h3>
-                  <input 
-                    type="date"
-                    value={leaveRequest.endDate}
-                    onChange={(e) => setLeaveRequest({...leaveRequest, endDate: e.target.value})}
-                    required
-                  />
+                <div className={styles.popupHeader}>
+                  <h2>Request Leave</h2>
+                  <button className={styles.closeButton} onClick={handleClosePopup}>×</button>
                 </div>
 
-                <h3>Reason</h3>
-                <input 
-                  type="text"
-                  value={leaveRequest.reason}
-                  onChange={(e) => setLeaveRequest({...leaveRequest, reason: e.target.value})}
-                  placeholder="Enter your reason for leave"
-                  required
-                />
+                <div className={styles.popupContent}>
+                  <div className={styles.formGroup}>
+                    <label>Leave Type</label>
+                    <select
+                      value={leaveRequest.type}
+                      onChange={(e) => setLeaveRequest({...leaveRequest, type: e.target.value})}
+                      required
+                    >
+                      <option value="">Select leave type</option>
+                      <option value="Full Day">Full Day</option>
+                      <option value="Half Day">Half Day</option>
+                      <option value="RH">RH</option>
+                      <option value="Compensatory Off">Compensatory Off</option>
+                    </select>
+                  </div>
 
-                <button 
-                  className={`${styles.doneButton} ${!isFormValid() ? styles.disabled : ''}`}
-                  onClick={handleSubmitLeave}
-                  disabled={!isFormValid()}
-                >
-                  Done
-                </button>
+                  <div className={styles.dateContainer}>
+                    <div className={styles.formGroup}>
+                      <label>Start Date</label>
+                      <input 
+                        type="date"
+                        value={leaveRequest.startDate}
+                        onChange={(e) => setLeaveRequest({...leaveRequest, startDate: e.target.value})}
+                        required
+                      />
+                    </div>
+
+                    <div className={styles.formGroup}>
+                      <label>End Date</label>
+                      <input 
+                        type="date"
+                        value={leaveRequest.endDate}
+                        onChange={(e) => setLeaveRequest({...leaveRequest, endDate: e.target.value})}
+                        required
+                      />
+                    </div>
+                  </div>
+
+                  <div className={styles.formGroup}>
+                    <label>Reason</label>
+                    <input 
+                      type="text"
+                      value={leaveRequest.reason}
+                      onChange={(e) => setLeaveRequest({...leaveRequest, reason: e.target.value})}
+                      placeholder="Enter your reason for leave"
+                      required
+                    />
+                  </div>
+
+                  <button 
+                    className={`${styles.submitButton} ${!isFormValid() ? styles.disabled : ''}`}
+                    onClick={handleSubmitLeave}
+                    disabled={!isFormValid()}
+                  >
+                    Submit Request
+                  </button>
+                </div>
               </div>
             </div>
           )}

@@ -3,9 +3,9 @@ import LeaveRequest from '@/server/models/LeaveRequest';
 import Employee from '@/server/models/Employee';
 
 function formatDate(date) {
-  return new Date(date).toLocaleDateString('en-US', {
-    day: 'numeric',
-    month: 'long',
+  return new Date(date).toLocaleDateString('en-GB', {
+    day: '2-digit',
+    month: 'short',
     year: 'numeric'
   });
 }
@@ -55,11 +55,10 @@ export default async function handler(req, res) {
       { $count: 'total' }
     ]);
 
-    // Add pagination to pipeline
-    pipeline.push(
-      { $skip: skip },
-      { $limit: parseInt(limit) }
-    );
+    if (parseInt(limit) > 0) {
+      pipeline.push({ $skip: skip });
+      pipeline.push({ $limit: parseInt(limit) });
+    }
 
     const leaveRequests = await LeaveRequest.aggregate(pipeline);
 
@@ -69,7 +68,8 @@ export default async function handler(req, res) {
       leaveType: request.type,
       leaveRequestDateFrom: formatDate(request.from),
       leaveRequestDateTo: formatDate(request.to),
-      leaveRequestedOn: formatDate(request.takenOn)
+      leaveRequestedOn: formatDate(request.takenOn),
+      cancelled: request.cancel === "1" ? "Yes" : "No"
     }));
 
     res.status(200).json({

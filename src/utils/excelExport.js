@@ -6,12 +6,13 @@ export const exportToExcel = async (data, filename) => {
 
   // Define columns
   worksheet.columns = [
-    { header: 'SAP ID', key: 'sapId', width: 15 },
-    { header: 'Employee Name', key: 'employeeName', width: 30 },
-    { header: 'Leave Type', key: 'leaveType', width: 20 },
-    { header: 'From Date', key: 'leaveRequestDateFrom', width: 15 },
-    { header: 'To Date', key: 'leaveRequestDateTo', width: 15 },
-    { header: 'Requested On', key: 'leaveRequestedOn', width: 15 },
+    { header: 'SAP ID', key: 'SAP ID', width: 15 },
+    { header: 'Employee Name', key: 'Employee Name', width: 30 },
+    { header: 'Leave Type', key: 'Leave Type', width: 20 },
+    { header: 'From Date', key: 'From Date', width: 15 },
+    { header: 'To Date', key: 'To Date', width: 15 },
+    { header: 'Requested On', key: 'Requested On', width: 15 },
+    { header: 'Cancelled', key: 'Cancelled', width: 15 },
   ];
 
   // Add rows

@@ -1,32 +1,28 @@
 import styles from '@/styles/user/LeaveCardGrid.module.css'; 
 import LeaveCard from './LeaveCard';
 
-const LeaveCardsGrid = ({ leaveStats }) => {
+const LeaveCardsGrid = ({ leaveStats, tooltipTexts }) => {
   return (
     <div className={styles.cardsGrid}>
       <LeaveCard
         title="Full Leave"
         {...leaveStats.fullLeave}
-        iconSrc="/full-leave-icon.svg"
-        altText="Full Leave Icon"
+        tooltipText={tooltipTexts.fullLeave}
       />
       <LeaveCard
         title="Half Leave"
         {...leaveStats.halfLeave}
-        iconSrc="/half-leave-icon.svg"
-        altText="Half Leave Icon"
+        tooltipText={tooltipTexts.halfLeave}
       />
       <LeaveCard
         title="RH"
         {...leaveStats.rhLeave}
-        iconSrc="/rh-icon.svg"
-        altText="RH Icon"
+        tooltipText={tooltipTexts.rhLeave}
       />
       <LeaveCard
         title="Comp Off"
-        {...leaveStats.compOff}
-        iconSrc="/comp-off-icon.svg"
-        altText="Comp Off Icon"
+        {...leaveStats.compOffLeave}
+        tooltipText={tooltipTexts.compOffLeave}
       />
     </div>
   );

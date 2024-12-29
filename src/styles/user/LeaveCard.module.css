@@ -2,11 +2,17 @@
     background: white;
     padding: 14px;
     border-radius: 25px;
-    border: 1px solid #6aa5e4;
+    border: 2px solid transparent;
     box-shadow: 0 8px 28px rgba(72, 89, 102, 0.1);
     display: flex;
     flex-direction: column;
     gap: 6px;
+    transition: border-color 0.3s ease;
+    cursor: pointer;
+}
+
+.card:hover {
+    border-color: #6aa5e4;
 }
 
 .cardTitle {
@@ -29,16 +35,15 @@
     display: flex;
     flex-direction: column;
     gap: 5px;
-    flex-grow: 0; /* Prevents the leaveStats from growing */
+    flex-grow: 0;
 }
 
 .statItem {
     display: grid;
-    grid-template-columns: 1fr 1fr; /* Use flexible columns for better fit */
+    grid-template-columns: 1fr 1fr;
     align-items: center;
-    gap: 5px; /* Adjusted gap for better spacing */
+    gap: 5px;
     margin-bottom: 1px;
-    position: relative;
 }
 
 .statLabel {
@@ -46,9 +51,6 @@
     font-size: 14px;
     font-family: "Lexend", sans-serif;
     min-width: 60px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
 }
 
 .statValue {
@@ -60,16 +62,12 @@
     min-width: 30px;
 }
 
-.remainingValue {
-    color: #6a7ee1; /* dark blue */
-}
-
 .usedValue {
-    color: #2a78cc; /* light blue */
+    color: #2a78cc;
 }
 
 .totalValue {
-    color: #1f25db; /* black */
+    color: #1f25db;
 }
 
 .progressCircle {
@@ -79,57 +77,24 @@
     justify-content: center;
     align-items: center;
 }
-.progressTextStatic {
-    position: absolute;
-    font-size: 16px;
-    font-weight: 500;
-    font-family: "Lexend", sans-serif;
-    color: blue;
-    text-align: center;
-}
 
 .progressText {
-    position: absolute;
     font-size: 16px;
     font-weight: 500;
     font-family: "Lexend", sans-serif;
     color: blue;
-    text-align: center;
-    opacity: 0; /* Initially hidden */
-    transition: opacity 0.3s ease; /* Smooth transition for visibility */
-}
-
-.progressCircle:hover .progressText {
-    opacity: 1; /* Show text on hover */
-}
-
-/* Progress circle styles */
-.circle {
-    transform: rotate(-90deg);
-    transform-origin: 50% 50%;
-}
-
-.circleBackground {
-    fill: none;
-    stroke: #F0F0F0;
-    stroke-width: 8;
 }
 
 .circleProgress {
     fill: none;
-    stroke: #3354F4; /* Set the stroke color */
+    stroke: #3354F4;
     stroke-width: 8;
     stroke-linecap: round;
-    transition: stroke-dashoffset 0.5s ease, stroke-width 0.5s ease; /* Added transition for stroke-width */
-    stroke-dasharray: 251.3274122871835; /* Ensure this matches the radius */
-    stroke-dashoffset: 251.3274122871835; /* Hide the progress initially */
+    transition: stroke-dashoffset 0.5s ease;
+    stroke-dasharray: 251.3274122871835;
+    stroke-dashoffset: 251.3274122871835;
 }
 
-.progressCircle:hover {
-    transform: scale(1.05); /* Slightly increase size on hover */
-}
-
-.progressCircle:hover .circleProgress {
-    stroke-dashoffset: calc(251.3274122871835 * (1 - var(--percentage) / 100)); /* Show the progress on hover */
-    stroke-width: 10; /* Optionally increase stroke width */
+.card:hover .circleProgress {
+    stroke-dashoffset: calc(251.3274122871835 * (1 - var(--percentage) / 100));
 }

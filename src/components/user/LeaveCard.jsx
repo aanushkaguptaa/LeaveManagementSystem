@@ -1,12 +1,12 @@
 import styles from '@/styles/user/LeaveCard.module.css';
 
-const LeaveCard = ({ title, usedLeaves = 0, totalLeaves = 0, tooltipText }) => {
+const LeaveCard = ({ title, usedLeaves = 0, totalLeaves = 0, tooltipText, isLoading }) => {
   const safeUsedLeaves = Number(usedLeaves) || 0;
   const safeTotalLeaves = Number(totalLeaves) || 0;
   const percentage = (safeUsedLeaves / safeTotalLeaves) * 100 || 0;
 
   return (
-    <div className={styles.card} title={tooltipText}>
+    <div className={`${styles.card} ${isLoading ? styles.loading : ''}`} title={tooltipText}>
       <h3 className={styles.cardTitle}>{title}</h3>
       <div className={styles.cardStats}>
         <div className={styles.progressCircle} style={{ '--percentage': percentage }}>

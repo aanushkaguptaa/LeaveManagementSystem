@@ -8,12 +8,13 @@ const LEAVE_LIMITS = {
   'Compensatory Off': 2
 };
 
-function formatDate(date) {
-  return new Date(date).toLocaleDateString('en-GB', {
-    day: '2-digit',
-    month: 'short',
-    year: 'numeric'
-  });
+function calculateLeaveDays(from, to, type) {
+  const startDate = new Date(from);
+  const endDate = new Date(to);
+  const diffTime = Math.abs(endDate - startDate);
+  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
+  
+  return type === 'Half Day' ? 1 : diffDays;
 }
 
 export default async function handler(req, res) {
@@ -25,13 +26,13 @@ export default async function handler(req, res) {
     await connectDB();
     const { sapId } = req.query;
 
-    // Get all approved leave requests for the user
+    // Get all non-cancelled leave requests for the user
     const leaveRequests = await LeaveRequest.find({
       SAPID: sapId,
-      cancel: "0"
+      cancel: "0" // Only get non-cancelled requests
     });
 
-    // Calculate used leaves by type
+    // Initialize leave counts
     const usedLeaves = {
       'Full Day': 0,
       'Half Day': 0,
@@ -39,13 +40,13 @@ export default async function handler(req, res) {
       'Compensatory Off': 0
     };
 
+    // Calculate used leaves by type
     leaveRequests.forEach(request => {
-        if (usedLeaves.hasOwnProperty(request.type)) {
-            usedLeaves[request.type]++;
-        }
+      const days = calculateLeaveDays(request.from, request.to, request.type);
+      usedLeaves[request.type] += days;
     });
 
-    // Calculate leave statistics
+    // Format response data
     const leaveStats = {
       fullLeave: {
         usedLeaves: usedLeaves['Full Day'],
@@ -65,19 +66,30 @@ export default async function handler(req, res) {
       }
     };
 
-    // Get active leave requests
+    // Get active leave requests (non-cancelled)
     const activeRequests = await LeaveRequest.find({
       SAPID: sapId,
-      cancel: "0",
-      //to: { $gte: new Date() }
+      cancel: "0"
     }).sort({ takenOn: -1 });
 
     const formattedRequests = activeRequests.map(request => ({
       id: request.ID,
       type: request.type,
-      fromDate: formatDate(request.from),
-      toDate: formatDate(request.to),
-      requestedOn: formatDate(request.takenOn)
+      fromDate: new Date(request.from).toLocaleDateString('en-GB', {
+        day: '2-digit',
+        month: 'short',
+        year: 'numeric'
+      }),
+      toDate: new Date(request.to).toLocaleDateString('en-GB', {
+        day: '2-digit',
+        month: 'short',
+        year: 'numeric'
+      }),
+      requestedOn: new Date(request.takenOn).toLocaleDateString('en-GB', {
+        day: '2-digit',
+        month: 'short',
+        year: 'numeric'
+      })
     }));
 
     res.status(200).json({

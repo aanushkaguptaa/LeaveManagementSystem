@@ -14,7 +14,7 @@ export default async function handler(req, res) {
     const limit = parseInt(req.query.limit) || 10;
     const skip = (page - 1) * limit;
     
-    const today = new Date('2024-06-06');
+    const today = new Date();
     today.setHours(0, 0, 0, 0);
     
     // Find all active leave requests for today with pagination

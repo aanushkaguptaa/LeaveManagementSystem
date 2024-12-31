@@ -27,10 +27,6 @@ async function importEmployees(csvFilePath) {
                       name: row.name,
                       password: row.password,
                       role: row.role,
-                      fullday: parseInt(row.fullday, 10) || 0,
-                      halfday: parseInt(row.halfday, 10) || 0,
-                      rh: parseInt(row.rh, 10) || 0,
-                      compOff: parseInt(row.compOff, 10) || 0,
                   });
               } else {
                   console.warn(`Invalid or missing SAPID: ${JSON.stringify(row)}`);
@@ -108,8 +104,8 @@ async function main() {
       await mongoose.connect(process.env.MONGODB_URI);
       console.log('Connected to MongoDB Atlas');
 
-      await importEmployees('./server/database/employee.csv');
-      await importLeaveRequests('./server/database/request.csv');
+      await importEmployees('./src/server/database/employee.csv');
+      await importLeaveRequests('./src/server/database/request.csv');
   }  catch (error) {
     console.error('Error during import process:', error);
   } finally {

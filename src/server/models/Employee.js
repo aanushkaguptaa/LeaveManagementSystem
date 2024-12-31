@@ -19,26 +19,10 @@ const EmployeeSchema = new mongoose.Schema({
       type: String,
       enum: ['user', 'admin'],
       default: 'user'
-    },
-    fullday: {
-      type: Number,
-      default: 0
-    },
-    halfday: {
-      type: Number,
-      default: 0
-    },
-    rh: {
-      type: Number,
-      default: 0
-    },
-    compOff: {
-      type: Number,
-      default: 0
     }
-  }, {
+}, {
     timestamps: true
-  });
+});
 
 // Check if the model exists before compiling it
 module.exports = mongoose.models.Employee || mongoose.model('Employee', EmployeeSchema);

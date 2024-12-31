@@ -57,6 +57,8 @@ const UserDashboard = () => {
     }
   });
 
+  const [isLoading, setIsLoading] = useState(true);
+
   const handleDeleteClick = (requestId) => {
     setDeleteRequestId(requestId);
     setShowDeletePopup(true);
@@ -142,6 +144,7 @@ const UserDashboard = () => {
 
   const fetchUserData = async () => {
     try {
+      setIsLoading(true);
       const response = await fetch(`/api/user/dashboard?sapId=${user.sapId}`);
       const data = await response.json();
       if (response.ok) {
@@ -150,6 +153,8 @@ const UserDashboard = () => {
       }
     } catch (error) {
       console.error('Error fetching user data:', error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -181,6 +186,9 @@ const UserDashboard = () => {
 
   useEffect(() => {
     fetchUserData();
+    // Refresh data every 5 minutes
+    const interval = setInterval(fetchUserData, 5 * 60 * 1000);
+    return () => clearInterval(interval);
   }, [user.sapId]);
 
   return (
@@ -198,7 +206,11 @@ const UserDashboard = () => {
             </button>
           </div>
           
-          <LeaveCardsGrid leaveStats={leaveStats} tooltipTexts={tooltipTexts} />
+          <LeaveCardsGrid 
+            leaveStats={leaveStats} 
+            tooltipTexts={tooltipTexts}
+            isLoading={isLoading}
+          />
           
           <LeaveRequestsTable 
             requests={activeRequests}

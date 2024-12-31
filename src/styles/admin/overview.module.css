@@ -290,19 +290,3 @@
     border-radius: 16px;
     font-size: 14px;
   }
-
-  .removeFilter {
-    background: none;
-    border: none;
-    color: #495057;
-    cursor: pointer;
-    font-size: 18px;
-    padding: 0 4px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  .removeFilter:hover {
-    color: #dc3545;
-  }

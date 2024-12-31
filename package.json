@@ -3,8 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "import-data": "node server/importData.js",
-    "dev": "next dev --turbopack",
+    "import-data": "node src/server/importData.js",
+    "dev": "next dev",
     "build": "next build",
     "start": "next start",
     "lint": "next lint"

@@ -3,7 +3,8 @@ import styles from '@/styles/user/LeaveCard.module.css';
 const LeaveCard = ({ title, usedLeaves = 0, totalLeaves = 0, tooltipText, isLoading }) => {
   const safeUsedLeaves = Number(usedLeaves) || 0;
   const safeTotalLeaves = Number(totalLeaves) || 0;
-  const percentage = (safeUsedLeaves / safeTotalLeaves) * 100 || 0;
+  const isOverused = safeUsedLeaves > safeTotalLeaves;
+  const percentage = isOverused ? 100 : (safeUsedLeaves / safeTotalLeaves) * 100 || 0;
 
   return (
     <div className={`${styles.card} ${isLoading ? styles.loading : ''}`} title={tooltipText}>
@@ -24,7 +25,7 @@ const LeaveCard = ({ title, usedLeaves = 0, totalLeaves = 0, tooltipText, isLoad
               cy="50"
               r="40"
               fill="none"
-              className={styles.circleProgress}
+              className={`${styles.circleProgress} ${isOverused ? styles.overused : ''}`}
               strokeDasharray={`${2 * Math.PI * 40}`}
               strokeDashoffset={`${2 * Math.PI * 40}`}
               transform="rotate(-90 50 50)"
@@ -34,7 +35,7 @@ const LeaveCard = ({ title, usedLeaves = 0, totalLeaves = 0, tooltipText, isLoad
               y="50"
               textAnchor="middle"
               dominantBaseline="middle"
-              className={styles.progressText}
+              className={`${styles.progressText} ${isOverused ? styles.overused : ''}`}
             >
               {`${safeUsedLeaves}/${safeTotalLeaves}`}
             </text>

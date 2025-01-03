@@ -95,6 +95,17 @@
     stroke-dashoffset: 251.3274122871835;
 }
 
+.circleProgress.overused {
+    stroke: #dc3545;
+    stroke-dashoffset: 0;
+    transition: stroke-dashoffset 0.5s ease;
+}
+
+.progressText.overused {
+    color: #dc3545;
+
+}
+
 .card:hover .circleProgress {
     stroke-dashoffset: calc(251.3274122871835 * (1 - var(--percentage) / 100));
 }

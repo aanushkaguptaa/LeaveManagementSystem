@@ -17,6 +17,8 @@ const SCREEN2ADP = () => {
       role: ""
     };
   });
+
+  // Tooltip texts for various leave types
   const tooltipTexts = {
     employeesPresent: "Total number of employees present",
     halfLeave: "Total employees on half leave. (Off-shore employees can have first half off and On-shore employees the second respectively)",
@@ -62,10 +64,10 @@ const SCREEN2ADP = () => {
     fetchDashboardData();
   }, [currentPage]);
 
+  // Navigation handlers
   const onDashboardIconClick = useCallback(() => {
     router.push('/admin/adminpage');
   }, [router]);
-
 
   const onAttendanceOverviewIconClick = useCallback(() => {
     router.push('/admin/attendanceOverview');
@@ -75,6 +77,7 @@ const SCREEN2ADP = () => {
     router.push('/admin/attendanceOverview');
   }, [router]);
 
+  // Handle page change for pagination
   const handlePageChange = (newPage) => {
     setCurrentPage(newPage);
   };
@@ -89,41 +92,42 @@ const SCREEN2ADP = () => {
       />
       <main className={styles.mainContent}>
         <section className={styles.cardsSection}>
-        <Card 
-        title="Employees Present" 
-        count={leaveData.employeesPresent} 
-        iconSrc="/employees-icon.svg" 
-        altText="Employees Present Icon"
-        tooltipText={tooltipTexts.employeesPresent}
-      />
-      <Card 
-        title="Half Leave" 
-        count={leaveData.halfLeave} 
-        iconSrc="/half-leave-icon.svg" 
-        altText="Half Leave Icon"
-        tooltipText={tooltipTexts.halfLeave}
-      />
-      <Card 
-        title="Full Leave" 
-        count={leaveData.fullLeave} 
-        iconSrc="/full-leave-icon.svg" 
-        altText="Full Leave Icon"
-        tooltipText={tooltipTexts.fullLeave}
-      />
-      <Card 
-        title="RH Leave" 
-        count={leaveData.rhLeave} 
-        iconSrc="/rh-icon.svg" 
-        altText="RH Leave Icon"
-        tooltipText={tooltipTexts.rhLeave}
-      />
-      <Card 
-        title="Comp Off Leave" 
-        count={leaveData.compOffLeave} 
-        iconSrc="/comp-off-icon.svg" 
-        altText="Comp Off Leave Icon"
-        tooltipText={tooltipTexts.compOffLeave}
-      />
+          {/* Display cards for leave data */}
+          <Card 
+            title="Employees Present" 
+            count={leaveData.employeesPresent} 
+            iconSrc="/employees-icon.svg" 
+            altText="Employees Present Icon"
+            tooltipText={tooltipTexts.employeesPresent}
+          />
+          <Card 
+            title="Half Leave" 
+            count={leaveData.halfLeave} 
+            iconSrc="/half-leave-icon.svg" 
+            altText="Half Leave Icon"
+            tooltipText={tooltipTexts.halfLeave}
+          />
+          <Card 
+            title="Full Leave" 
+            count={leaveData.fullLeave} 
+            iconSrc="/full-leave-icon.svg" 
+            altText="Full Leave Icon"
+            tooltipText={tooltipTexts.fullLeave}
+          />
+          <Card 
+            title="RH Leave" 
+            count={leaveData.rhLeave} 
+            iconSrc="/rh-icon.svg" 
+            altText="RH Leave Icon"
+            tooltipText={tooltipTexts.rhLeave}
+          />
+          <Card 
+            title="Comp Off Leave" 
+            count={leaveData.compOffLeave} 
+            iconSrc="/comp-off-icon.svg" 
+            altText="Comp Off Leave Icon"
+            tooltipText={tooltipTexts.compOffLeave}
+          />
         </section>
 
         <button className={styles.viewAttendanceButton} onClick={handleViewAttendanceClick}>

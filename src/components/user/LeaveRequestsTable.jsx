@@ -16,6 +16,7 @@ const LeaveRequestsTable = ({ requests, onDeleteRequest }) => {
           </tr>
         </thead>
         <tbody>
+          {/* Render each leave request as a table row */}
           {requests.map((request) => (
             <tr key={request.id}>
               <td>{request.id}</td>
@@ -24,6 +25,7 @@ const LeaveRequestsTable = ({ requests, onDeleteRequest }) => {
               <td>{request.toDate}</td>
               <td>{request.requestedOn}</td>
               <td>
+                {/* Button to cancel the leave request */}
                 <button 
                   className={styles.deleteButton}
                   onClick={() => onDeleteRequest(request.id)}

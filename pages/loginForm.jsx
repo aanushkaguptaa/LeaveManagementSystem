@@ -8,7 +8,7 @@ import { useAuth } from '@/contexts/AuthContext';
 export default function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const type = searchParams.get('type');
+  const type = searchParams.get('type'); // Determine login type (user/admin)
   const { setUser } = useAuth();
   
   const [formData, setFormData] = useState({
@@ -18,10 +18,12 @@ export default function LoginForm() {
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
+  // Validate SAP ID format
   const validateSapId = (sapId) => {
     return /^\d{8}$/.test(sapId);
   };
 
+  // Check if form is valid
   const isFormValid = () => {
     if (!validateSapId(formData.sapId)) {
       return false;
@@ -32,6 +34,7 @@ export default function LoginForm() {
     return true;
   };
 
+  // Handle input changes and validate SAP ID
   const handleInputChange = (e) => {
     const { id, value } = e.target;
     if (id === 'sapId' && !/^\d{0,8}$/.test(value)) {
@@ -44,6 +47,7 @@ export default function LoginForm() {
     setError('');
   };
 
+  // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!isFormValid()) return;
@@ -52,6 +56,7 @@ export default function LoginForm() {
     setError('');
 
     try {
+      // Send login request to the server
       const response = await fetch('/api/auth/login', {
         method: 'POST',
         headers: {
@@ -79,11 +84,10 @@ export default function LoginForm() {
       // Update auth context
       setUser(data.user);
 
-      // If admin login was successful, redirect to admin page
+      // Redirect based on user role
       if (type === 'admin' && data.user.role === 'admin') {
         router.push('/admin/adminpage');
       } else {
-        // Otherwise redirect to user page
         router.push('/user/userpage');
       }
 

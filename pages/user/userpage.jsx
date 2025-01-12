@@ -8,7 +8,7 @@ import ProtectedRoute from '@/components/ProtectedRoute';
 import { useAuth } from '@/contexts/AuthContext';
 
 const UserDashboard = () => {
-  const { user } = useAuth();
+  const { user } = useAuth(); // Get user information from context
 
   const tooltipTexts = {
     halfLeave: "Off-shore employees can have first half off and On-shore employees the second respectively",
@@ -17,9 +17,9 @@ const UserDashboard = () => {
     compOffLeave: "Compensatory Off - leave granted for working on holidays/weekends"
   };
 
-  const [showDeletePopup, setShowDeletePopup] = useState(false);
-  const [deleteRequestId, setDeleteRequestId] = useState(null);
-  const [showLeavePopup, setShowLeavePopup] = useState(false);
+  const [showDeletePopup, setShowDeletePopup] = useState(false); // State for delete confirmation popup
+  const [deleteRequestId, setDeleteRequestId] = useState(null); // State for the request ID to delete
+  const [showLeavePopup, setShowLeavePopup] = useState(false); // State for leave request popup
   
   const [leaveRequest, setLeaveRequest] = useState({
     type: '',
@@ -29,6 +29,7 @@ const UserDashboard = () => {
   });
 
   const isFormValid = () => {
+    // Validate leave request form
     return (
       leaveRequest.type !== '' &&
       leaveRequest.startDate !== '' &&
@@ -37,7 +38,7 @@ const UserDashboard = () => {
     );
   };
 
-  const [activeRequests, setActiveRequests] = useState([]);
+  const [activeRequests, setActiveRequests] = useState([]); // State for active leave requests
   const [leaveStats, setLeaveStats] = useState({
     fullLeave: {
       usedLeaves: 0,
@@ -57,16 +58,16 @@ const UserDashboard = () => {
     }
   });
 
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(true); // State for loading status
 
   const handleDeleteClick = (requestId) => {
-    setDeleteRequestId(requestId);
-    setShowDeletePopup(true);
+    setDeleteRequestId(requestId); // Set the request ID to delete
+    setShowDeletePopup(true); // Show delete confirmation popup
   };
 
   const handleConfirmDelete = async () => {
     try {
-      console.log('Cancelling request:', deleteRequestId);
+      console.log('Cancelling request:', deleteRequestId); // Debug log
       const response = await fetch('/api/user/cancelRequest', {
         method: 'PUT',
         headers: {
@@ -79,36 +80,36 @@ const UserDashboard = () => {
 
       if (response.ok) {
         await fetchUserData(); // Wait for the data to refresh
-        setShowDeletePopup(false);
-        setDeleteRequestId(null);
+        setShowDeletePopup(false); // Close the delete popup
+        setDeleteRequestId(null); // Reset delete request ID
       } else {
         const data = await response.json();
-        console.error('Cancel failed:', data);
-        alert(data.message || 'Failed to cancel request');
+        console.error('Cancel failed:', data); // Debug log
+        alert(data.message || 'Failed to cancel request'); // Alert on failure
       }
     } catch (error) {
-      console.error('Error cancelling request:', error);
-      alert('Failed to cancel request');
+      console.error('Error cancelling request:', error); // Log error
+      alert('Failed to cancel request'); // Alert on failure
     }
   };
 
   const handleCancelDelete = () => {
-    setShowDeletePopup(false);
-    setDeleteRequestId(null);
+    setShowDeletePopup(false); // Close the delete popup
+    setDeleteRequestId(null); // Reset delete request ID
   };
 
   const handleRequestLeave = () => {
-    setShowLeavePopup(true);
+    setShowLeavePopup(true); // Show leave request popup
   };
 
   const handleClosePopup = () => {
-    setShowLeavePopup(false);
+    setShowLeavePopup(false); // Close leave request popup
     setLeaveRequest({
       type: '',
       startDate: '',
       endDate: '',
       reason: ''
-    });
+    }); // Reset leave request form
   };
 
   const handleSubmitLeave = async () => {
@@ -130,31 +131,31 @@ const UserDashboard = () => {
 
         if (response.ok) {
           fetchUserData(); // Refresh the data
-          handleClosePopup();
+          handleClosePopup(); // Close the leave request popup
         } else {
           const data = await response.json();
-          alert(data.message || 'Failed to create leave request');
+          alert(data.message || 'Failed to create leave request'); // Alert on failure
         }
       } catch (error) {
-        console.error('Error creating leave request:', error);
-        alert('Failed to create leave request');
+        console.error('Error creating leave request:', error); // Log error
+        alert('Failed to create leave request'); // Alert on failure
       }
     }
   };
 
   const fetchUserData = async () => {
     try {
-      setIsLoading(true);
+      setIsLoading(true); // Set loading state
       const response = await fetch(`/api/user/dashboard?sapId=${user.sapId}`);
       const data = await response.json();
       if (response.ok) {
-        setLeaveStats(data.leaveStats);
-        setActiveRequests(data.activeRequests);
+        setLeaveStats(data.leaveStats); // Set leave statistics
+        setActiveRequests(data.activeRequests); // Set active requests
       }
     } catch (error) {
-      console.error('Error fetching user data:', error);
+      console.error('Error fetching user data:', error); // Log error
     } finally {
-      setIsLoading(false);
+      setIsLoading(false); // Reset loading state
     }
   };
 
@@ -176,19 +177,19 @@ const UserDashboard = () => {
       } else {
         const data = await response.json();
         console.error('Cancel failed:', data); // Debug log
-        alert(data.message || 'Failed to cancel request');
+        alert(data.message || 'Failed to cancel request'); // Alert on failure
       }
     } catch (error) {
-      console.error('Error cancelling request:', error);
-      alert('Failed to cancel request');
+      console.error('Error cancelling request:', error); // Log error
+      alert('Failed to cancel request'); // Alert on failure
     }
   };
 
   useEffect(() => {
-    fetchUserData();
+    fetchUserData(); // Fetch user data on component mount
     // Refresh data every 5 minutes
     const interval = setInterval(fetchUserData, 5 * 60 * 1000);
-    return () => clearInterval(interval);
+    return () => clearInterval(interval); // Cleanup interval on unmount
   }, [user.sapId]);
 
   return (
@@ -301,7 +302,7 @@ const UserDashboard = () => {
                   <button 
                     className={`${styles.submitButton} ${!isFormValid() ? styles.disabled : ''}`}
                     onClick={handleSubmitLeave}
-                    disabled={!isFormValid()}
+                    disabled={!isFormValid()} // Disable button if form is invalid
                   >
                     Submit Request
                   </button>

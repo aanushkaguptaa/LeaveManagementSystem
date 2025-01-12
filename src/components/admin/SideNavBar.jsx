@@ -5,6 +5,7 @@ import styles from '../../styles/admin/SideNavBar.module.css';
 const SideNavBar = ({ onDashboardIconClick, onAttendanceOverviewIconClick, activePage }) => {
   return (
     <aside className={styles.sidenav} id="sideNav">
+      {/* Dashboard icon with click handler */}
       <Image
         className={styles.dashboardIcon}
         width={24}
@@ -15,6 +16,7 @@ const SideNavBar = ({ onDashboardIconClick, onAttendanceOverviewIconClick, activ
         style={{ cursor: 'pointer' }}
         title="Go to Dashboard"
       />
+      {/* Attendance overview icon with click handler */}
       <Image
         className={styles.attendanceOverviewIcon}
         width={24}

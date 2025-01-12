@@ -10,6 +10,7 @@ const LeaveCard = ({ title, usedLeaves = 0, totalLeaves = 0, tooltipText, isLoad
     <div className={`${styles.card} ${isLoading ? styles.loading : ''}`} title={tooltipText}>
       <h3 className={styles.cardTitle}>{title}</h3>
       <div className={styles.cardStats}>
+        {/* Circular progress indicator */}
         <div className={styles.progressCircle} style={{ '--percentage': percentage }}>
           <svg width="100" height="100" viewBox="0 0 100 100">
             <circle
@@ -41,6 +42,7 @@ const LeaveCard = ({ title, usedLeaves = 0, totalLeaves = 0, tooltipText, isLoad
             </text>
           </svg>
         </div>
+        {/* Display leave statistics */}
         <div className={styles.leaveStats}>
           <div className={styles.statItem}>
             <span className={styles.statLabel}>Used</span>

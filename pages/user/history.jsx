@@ -18,14 +18,17 @@ const History = () => {
     endDate: ''
   });
 
+  // Handle search button click to open the popup
   const handleSearchClick = (popupType) => {
     setActivePopup(popupType);
   };
 
+  // Close the active popup
   const handleClosePopup = () => {
     setActivePopup(null);
   };
 
+  // Fetch leave history data with optional filters
   const fetchHistory = async (filters = {}) => {
     try {
       const queryParams = new URLSearchParams({
@@ -47,10 +50,12 @@ const History = () => {
     }
   };
 
+  // Fetch history data on component mount
   useEffect(() => {
     fetchHistory();
   }, [user.sapId]);
 
+  // Apply search filters and fetch filtered data
   const handleApplySearch = async (type, value) => {
     setSearchFilters(prev => ({
       ...prev,
@@ -67,6 +72,7 @@ const History = () => {
     setActivePopup(null);
   };
 
+  // Export history data to Excel
   const handleExport = () => {
     if (historyData.length === 0) {
       alert('No data to export');

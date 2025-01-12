@@ -1,7 +1,9 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  webpack: (config) => {
-    config.experiments = { ...config.experiments, topLevelAwait: true };
+  webpack: (config, { dev }) => {
+    if (dev) {
+      config.cache = false;
+    }
     return config;
   }
 };

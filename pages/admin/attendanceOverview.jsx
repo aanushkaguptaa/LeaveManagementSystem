@@ -20,16 +20,16 @@ const SCREEN1ADP = () => {
 
   const router = useRouter(); 
   const onDashboardIconClick = useCallback(() => {
-    router.push('/admin/adminpage');
+    router.push('/admin/adminpage'); // Navigate to admin dashboard
   }, [router]);
 
   const onAttendanceOverviewIconClick = useCallback(() => {
-    router.push('/admin/attendanceOverview');
+    router.push('/admin/attendanceOverview'); // Navigate to attendance overview
   }, [router]);
 
-  const [attendanceData, setAttendanceData] = useState([]);
+  const [attendanceData, setAttendanceData] = useState([]); // State for attendance data
 
-  const [activePopup, setActivePopup] = useState(null);
+  const [activePopup, setActivePopup] = useState(null); // State for active popup
   const [searchFilters, setSearchFilters] = useState({
     sapId: '',
     employeeName: '',
@@ -38,9 +38,9 @@ const SCREEN1ADP = () => {
     leaveType: ''
   });
 
-  const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
-  const itemsPerPage = 10;
+  const [currentPage, setCurrentPage] = useState(1); // Current page for pagination
+  const [totalPages, setTotalPages] = useState(1); // Total pages for pagination
+  const itemsPerPage = 10; // Items per page
 
   useEffect(() => {
     const fetchAttendanceData = async () => {
@@ -54,42 +54,41 @@ const SCREEN1ADP = () => {
         const response = await fetch(`/api/admin/attendanceOverview?${queryParams}`);
         const data = await response.json();
         
-        setAttendanceData(data.requests);
-        setTotalPages(data.pagination.totalPages);
+        setAttendanceData(data.requests); // Set attendance data
+        setTotalPages(data.pagination.totalPages); // Set total pages
       } catch (error) {
-        console.error('Error fetching attendance data:', error);
+        console.error('Error fetching attendance data:', error); // Log fetch error
       }
     };
 
-    fetchAttendanceData();
+    fetchAttendanceData(); // Fetch attendance data on component mount or when filters change
   }, [searchFilters, currentPage]);
 
   const handleSearchClick = (popupType) => {
-    setActivePopup(popupType);
+    setActivePopup(popupType); // Set active popup for search
   };
 
   const handleClosePopup = () => {
-    setActivePopup(null);
+    setActivePopup(null); // Close the active popup
   };
 
   const handleApplySearch = (type, value) => {
     setSearchFilters(prev => ({
       ...prev,
-      ...value
+      ...value // Update search filters
     }));
-    setActivePopup(null);
+    setActivePopup(null); // Close the popup after applying search
   };
 
   const handlePageChange = (newPage) => {
-    setCurrentPage(newPage);
+    setCurrentPage(newPage); // Change the current page
   };
-
 
   const handleExportClick = async () => {
     try {
       const queryParams = new URLSearchParams({
         ...searchFilters,
-        limit: '0'
+        limit: '0' // Set limit to 0 for export
       }).toString();
       
       const response = await fetch(`/api/admin/attendanceOverview?${queryParams}`);
@@ -100,7 +99,7 @@ const SCREEN1ADP = () => {
       const data = await response.json();
       
       if (!data.requests || data.requests.length === 0) {
-        alert('No data available to export');
+        alert('No data available to export'); // Alert if no data to export
         return;
       }
   
@@ -113,10 +112,10 @@ const SCREEN1ADP = () => {
         'Requested On': item.leaveRequestedOn
       }));
     
-      await exportToExcel(exportData, 'attendance_overview');
+      await exportToExcel(exportData, 'attendance_overview'); // Export data to Excel
     } catch (error) {
-      console.error('Export error:', error);
-      alert('Failed to export data');
+      console.error('Export error:', error); // Log export error
+      alert('Failed to export data'); // Alert on export failure
     }
   };
 

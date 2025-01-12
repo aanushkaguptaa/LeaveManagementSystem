@@ -4,6 +4,7 @@ import LeaveCard from './LeaveCard';
 const LeaveCardsGrid = ({ leaveStats, tooltipTexts, isLoading }) => {
   return (
     <div className={styles.cardsGrid}>
+      {/* Render leave cards for each leave type */}
       <LeaveCard
         title="Full Leave"
         {...leaveStats.fullLeave}

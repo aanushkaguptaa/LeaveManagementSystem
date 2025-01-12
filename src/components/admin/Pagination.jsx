@@ -4,6 +4,7 @@ import styles from '../../styles/admin/pagination.module.css';
 const Pagination = ({ currentPage, totalPages, onPageChange }) => {
   const [jumpToPage, setJumpToPage] = useState('');
 
+  // Handle page jump form submission
   const handleJumpSubmit = (e) => {
     e.preventDefault();
     const pageNum = parseInt(jumpToPage);
@@ -15,6 +16,7 @@ const Pagination = ({ currentPage, totalPages, onPageChange }) => {
 
   return (
     <div className={styles.pagination}>
+      {/* Previous page button */}
       <button 
         onClick={() => onPageChange(currentPage - 1)}
         disabled={currentPage === 1}
@@ -23,10 +25,12 @@ const Pagination = ({ currentPage, totalPages, onPageChange }) => {
         Previous
       </button>
       
+      {/* Current page info */}
       <span className={styles.pageInfo}>
         Page {currentPage} of {totalPages}
       </span>
 
+      {/* Next page button */}
       <button 
         onClick={() => onPageChange(currentPage + 1)}
         disabled={currentPage === totalPages}
@@ -35,6 +39,7 @@ const Pagination = ({ currentPage, totalPages, onPageChange }) => {
         Next
       </button>
 
+      {/* Jump to page form */}
       <form onSubmit={handleJumpSubmit} className={styles.jumpForm}>
         <input
           type="number"

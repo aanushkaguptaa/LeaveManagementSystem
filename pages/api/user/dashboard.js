@@ -1,6 +1,7 @@
 import { connectDB } from '@/server/config/db';
 import LeaveRequest from '@/server/models/LeaveRequest';
 
+// Define leave limits for different types
 const LEAVE_LIMITS = {
   'Full Day': 15,
   'Half Day': 10,
@@ -8,6 +9,7 @@ const LEAVE_LIMITS = {
   'Compensatory Off': 2
 };
 
+// Helper function to calculate the number of leave days
 function calculateLeaveDays(from, to, type) {
   const startDate = new Date(from);
   const endDate = new Date(to);
@@ -18,12 +20,16 @@ function calculateLeaveDays(from, to, type) {
 }
 
 export default async function handler(req, res) {
+  // Ensure the request method is GET
   if (req.method !== 'GET') {
     return res.status(405).json({ message: 'Method not allowed' });
   }
 
   try {
+    // Connect to the database
     await connectDB();
+    
+    // Extract SAP ID from query parameters
     const { sapId } = req.query;
 
     // Get all non-cancelled leave requests for the user
@@ -72,6 +78,7 @@ export default async function handler(req, res) {
       cancel: "0"
     }).sort({ takenOn: -1 });
 
+    // Format active requests for the response
     const formattedRequests = activeRequests.map(request => ({
       id: request.ID,
       type: request.type,
@@ -92,6 +99,7 @@ export default async function handler(req, res) {
       })
     }));
 
+    // Send the response with leave stats and active requests
     res.status(200).json({
       leaveStats,
       activeRequests: formattedRequests

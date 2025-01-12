@@ -4,13 +4,16 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 
 export default async function handler(req, res) {
+  // Ensure the request method is POST
   if (req.method !== 'POST') {
     return res.status(405).json({ message: 'Method not allowed' });
   }
 
   try {
+    // Connect to the database
     await connectDB();
     
+    // Extract login credentials from the request body
     const { sapId, password, type } = req.body;
     console.log('Login attempt:', { sapId, password, type });
     
@@ -18,6 +21,7 @@ export default async function handler(req, res) {
     const employee = await Employee.findOne({ SAPID: sapId });
     console.log('Found employee:', employee);
     
+    // If no employee is found, return an error
     if (!employee) {
       return res.status(401).json({ message: 'Invalid credentials' });
     }
@@ -48,6 +52,7 @@ export default async function handler(req, res) {
       { expiresIn: '1d' }
     );
 
+    // Send the response with the token and user info
     res.status(200).json({
       token,
       user: {

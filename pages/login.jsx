@@ -25,12 +25,14 @@ export default function LoginSelection() {
         <div className={styles.selectionBox}>
           <h2 className={styles.selectionTitle}>Select Login Type</h2>
           <div className={styles.buttonGroup}>
+            {/* Button to navigate to user login form */}
             <button 
               className={styles.selectionButton}
               onClick={() => router.push('/loginForm?type=user')}
             >
               User Login
             </button>
+            {/* Button to navigate to admin login form */}
             <button 
               className={styles.selectionButton}
               onClick={() => router.push('/loginForm?type=admin')}

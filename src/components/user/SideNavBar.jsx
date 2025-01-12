@@ -6,10 +6,12 @@ import styles from '../../styles/user/SideNavBar.module.css';
 const SideNavBar = ({ activePage }) => {
   const router = useRouter();
 
+  // Navigate to the user dashboard
   const handleDashboardClick = () => {
     router.push('/user/userpage');
   };
 
+  // Navigate to the user history page
   const handleHistoryClick = () => {
     router.push('/user/history');
   };
@@ -17,6 +19,7 @@ const SideNavBar = ({ activePage }) => {
   return (
     <aside className={styles.sidenav} id="sideNav">
       <div className={styles.iconWrapper}>
+        {/* Dashboard icon with tooltip */}
         <div 
           className={styles.dashboardIcon}
           onClick={handleDashboardClick}
@@ -32,6 +35,7 @@ const SideNavBar = ({ activePage }) => {
       </div>
 
       <div className={styles.iconWrapper}>
+        {/* History icon with tooltip */}
         <div 
           className={styles.historyIcon}
           onClick={handleHistoryClick}

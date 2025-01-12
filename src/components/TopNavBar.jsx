@@ -9,12 +9,14 @@ const TopNavBar = ({ user }) => {
   const [showDropdown, setShowDropdown] = useState(false);
   const router = useRouter();
 
+  // Handle user sign out
   const handleSignOut = () => {
     setShowDropdown(false);
     logout();
     router.push('/auth/login'); // Redirect to the login page
   };
 
+  // Navigate to the appropriate dashboard based on user role
   const handleHclLogoClick = useCallback(() => {
     if (router.pathname.includes('/admin')) {
       router.push('/admin/adminpage');
@@ -25,6 +27,7 @@ const TopNavBar = ({ user }) => {
 
   return (
     <header className={styles.navbar} id="TopNavBar">
+      {/* HCL Logo with click handler */}
       <Image
         className={styles.hclLogo}
         width={139}
@@ -44,6 +47,7 @@ const TopNavBar = ({ user }) => {
         src="/separator.svg"
       />
       <div className={styles.adminContainer}>
+        {/* User profile and dropdown toggle */}
         <button 
           className={styles.admindetails} 
           id="loginDetails"
@@ -62,6 +66,7 @@ const TopNavBar = ({ user }) => {
           </div>
         </button>
         
+        {/* Dropdown menu for user actions */}
         {showDropdown && (
           <div className={styles.dropdown}>
             <div className={styles.dropdownContent}>
